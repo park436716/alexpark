@@ -1,0 +1,23 @@
+# Obsidian
+.obsidian/
+.trash/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Optional: keep PDFs out of git if they are large or copyrighted.
+# Uncomment the next line to ignore PDFs.
+# papers/*.pdf
