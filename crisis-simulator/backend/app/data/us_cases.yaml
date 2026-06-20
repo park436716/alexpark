@@ -1,0 +1,76 @@
+cases:
+  - id: tylenol_1982
+    company: Johnson & Johnson
+    crisis: Tylenol cyanide poisoning
+    type: product_safety
+    crisis_responsibility: low
+    key_lessons:
+      - Put customer safety above short-term profit
+      - Recall aggressively when public safety is uncertain
+      - Introduce structural safeguards after the incident
+    good_moves:
+      - nationwide recall
+      - cooperation with authorities
+      - tamper-resistant packaging
+    bad_moves: []
+
+  - id: united_2017
+    company: United Airlines
+    crisis: Passenger removal video
+    type: customer_abuse
+    crisis_responsibility: high
+    key_lessons:
+      - Avoid operational jargon
+      - Acknowledge personal harm
+      - CEO apology must be direct
+    good_moves:
+      - later policy changes
+      - compensation
+    bad_moves:
+      - defensive initial statement
+      - weak empathy
+
+  - id: starbucks_2018
+    company: Starbucks
+    crisis: Philadelphia arrests
+    type: racial_bias
+    crisis_responsibility: high
+    key_lessons:
+      - Symbolic crisis requires visible action
+      - Store-level incident can become brand identity crisis
+      - Training and policy change matter
+    good_moves:
+      - public apology
+      - store closure for bias training
+    bad_moves:
+      - inconsistent store policy
+
+  - id: southwest_2022
+    company: Southwest Airlines
+    crisis: Holiday operational meltdown
+    type: operational_failure
+    crisis_responsibility: medium_high
+    key_lessons:
+      - Operational failure becomes regulatory crisis if customers are stranded
+      - Compensation and real-time information are central
+    good_moves:
+      - later compensation
+      - operational review
+    bad_moves:
+      - delayed customer support
+      - system fragility
+
+  - id: crowdstrike_2024
+    company: CrowdStrike
+    crisis: Global IT outage
+    type: ai_or_software_failure
+    crisis_responsibility: medium_high
+    key_lessons:
+      - Technical remediation must be translated into customer language
+      - B2B incidents can create B2C harm
+      - Speed matters, but clarity matters more
+    good_moves:
+      - quick technical updates
+      - executive acknowledgement
+    bad_moves:
+      - perceived insufficiency of apology tone
