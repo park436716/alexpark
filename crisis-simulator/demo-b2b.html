@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Crisis Workshop — Facilitator Console Demo</title>
+<style>
+  :root {
+    --bad: #d92626;
+    --good: #1a8a3d;
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --border: #2a2e37;
+    --text: #e8e9ec;
+    --muted: #9aa0ab;
+    --accent: #3b6ef0;
+    --brand: #c9a13b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 24px;
+  }
+  .app { max-width: 1080px; margin: 0 auto; }
+  .topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .agency-logo {
+    width: 28px; height: 28px; border-radius: 6px; background: var(--brand);
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: #1a1208;
+  }
+  h1 { font-size: 18px; margin: 0; }
+  .subtitle { color: var(--muted); font-size: 12px; margin-bottom: 22px; }
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn .25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* ---------- Intake (agency setup) ---------- */
+  .field-row { margin-bottom: 14px; }
+  .field-label { font-size: 12px; color: var(--muted); margin-bottom: 5px; display: block; }
+  input[type=text], select, textarea {
+    width: 100%; background: #14161b; border: 1px solid var(--border); color: var(--text);
+    padding: 9px 10px; border-radius: 8px; font-size: 13.5px; font-family: inherit;
+  }
+  .role-chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .role-chip {
+    border: 1px solid var(--border); background: #14161b; color: var(--muted);
+    padding: 7px 13px; border-radius: 999px; font-size: 12.5px; cursor: pointer; user-select: none;
+  }
+  .role-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .btn-primary {
+    background: var(--accent); color: white; border: none; padding: 10px 18px;
+    border-radius: 8px; cursor: pointer; font-size: 14px; margin-top: 8px;
+  }
+  .btn-primary:hover { background: #2f5cd6; }
+  .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-secondary {
+    background: transparent; color: var(--muted); border: 1px solid var(--border);
+    padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; margin-top: 8px; margin-left: 8px;
+  }
+  .btn-ghost {
+    background: transparent; color: var(--accent); border: none; padding: 4px 0;
+    cursor: pointer; font-size: 12.5px; text-decoration: underline;
+  }
+
+  /* ---------- Facilitator console ---------- */
+  .console-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px; align-items: start; }
+  @media (max-width: 800px) { .console-grid { grid-template-columns: 1fr; } }
+
+  .phase-badge { display: inline-block; background: #2a2e37; color: var(--muted); font-size: 12px; padding: 4px 10px; border-radius: 999px; margin-bottom: 12px; }
+  .progress-track { height: 4px; background: #2a2e37; border-radius: 4px; margin-bottom: 16px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); transition: width .4s ease; }
+
+  .role-status-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+    background: #14161b; margin-bottom: 8px;
+  }
+  .role-status-name { font-size: 13.5px; font-weight: 600; }
+  .role-status-pill { font-size: 11px; padding: 3px 9px; border-radius: 999px; }
+  .pill-pending { background: #3a2f14; color: #d9a526; }
+  .pill-submitted { background: #163a22; color: var(--good); }
+
+  .role-active-banner {
+    font-size: 12px; color: var(--muted); margin-bottom: 10px; padding: 8px 10px;
+    background: #14161b; border: 1px solid var(--border); border-radius: 8px;
+  }
+  .role-active-banner b { color: var(--text); }
+
+  .options { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .option-btn {
+    text-align: left; background: #14161b; border: 1px solid var(--border); color: var(--text);
+    padding: 11px 13px; border-radius: 10px; cursor: pointer; font-size: 13.5px; line-height: 1.4;
+  }
+  .option-btn:hover { border-color: #4a5568; background: #1f2229; }
+  .option-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .option-btn b { color: var(--muted); margin-right: 6px; }
+
+  .scoreboard { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .score-item { background: #14161b; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .score-label { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+  .score-value { font-size: 20px; font-weight: 700; margin: 3px 0; }
+  .score-bar-bg { height: 6px; background: #2a2e37; border-radius: 4px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 4px; transition: width .5s ease; }
+  .score-delta { font-size: 11px; margin-left: 6px; font-weight: 600; }
+  .delta-up { color: var(--bad); }
+  .delta-down { color: var(--good); }
+  .delta-flash { animation: flash .8s ease; }
+  @keyframes flash { 0% { background: #2a3a55; } 100% { background: #14161b; } }
+
+  .loading-row { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; padding: 10px 0; }
+  .spinner {
+    width: 14px; height: 14px; border: 2px solid #2a2e37; border-top-color: var(--accent);
+    border-radius: 50%; animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- Coherence feedback ---------- */
+  .coherence-flag {
+    display: flex; gap: 8px; padding: 10px 12px; border-radius: 10px; margin-bottom: 8px;
+    border: 1px solid #4a3a14; background: #221a0c; font-size: 12.5px; line-height: 1.5;
+  }
+  .coherence-flag .icon { color: #d9a526; }
+  .feedback-score { font-size: 32px; font-weight: 800; }
+  .tag-list { margin: 8px 0 14px; padding-left: 18px; font-size: 13px; line-height: 1.6; }
+  .tag-list.strength li { color: #6fd08c; }
+  .tag-list.weakness li { color: #f08a8a; }
+  .quote-row { display: flex; gap: 10px; font-size: 13px; padding: 8px 0; border-top: 1px solid var(--border); }
+  .quote-row:first-child { border-top: none; }
+  .quote-name { color: var(--muted); min-width: 80px; font-weight: 600; }
+  .role-decision-row { display: flex; gap: 10px; font-size: 12.5px; padding: 7px 0; border-top: 1px solid var(--border); }
+  .role-decision-row:first-child { border-top: none; }
+  .role-decision-name { color: #7a90d9; min-width: 70px; font-weight: 700; }
+
+  /* ---------- Report ---------- */
+  .report-header { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  .report-agency-logo { width: 40px; height: 40px; border-radius: 8px; background: var(--brand); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: #1a1208; }
+  .report-title { font-size: 16px; font-weight: 700; }
+  .report-sub { font-size: 12px; color: var(--muted); }
+  .role-score-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 6px; }
+  .role-score-table th { text-align: left; color: var(--muted); font-size: 11px; text-transform: uppercase; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  .role-score-table td { padding: 8px 8px; border-bottom: 1px solid var(--border); }
+  .timeline-chart { display: flex; align-items: flex-end; gap: 4px; height: 90px; margin: 14px 0 6px; }
+  .timeline-bar { flex: 1; border-radius: 4px 4px 0 0; background: var(--accent); position: relative; }
+  .timeline-labels { display: flex; gap: 4px; font-size: 9.5px; color: var(--muted); text-align: center; }
+  .timeline-labels span { flex: 1; }
+  .diff-box { background: #14161b; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 13px; line-height: 1.6; margin-top: 6px; }
+  .pdf-note { font-size: 11.5px; color: var(--muted); margin-top: 16px; padding: 10px; border: 1px dashed var(--border); border-radius: 8px; }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar"><div class="agency-logo" id="agency-logo">A</div><h1 id="agency-name">Agency Console</h1></div>
+<div class="subtitle">B2B 워크숍 데모 — 에이전시 셋업 → 멀티롤 위기룸 → 퍼실리테이터 콘솔 → 화이트레이블 리포트 (로컬 모의, API 호출 없음)</div>
+
+<!-- SCREEN 1: AGENCY/WORKSHOP SETUP -->
+<div class="screen active" id="screen-setup">
+  <div class="card">
+    <div style="font-weight:700; font-size:14px; margin-bottom:14px;">새 워크숍 시작</div>
+
+    <div class="field-row">
+      <label class="field-label">에이전시명</label>
+      <input type="text" id="input-agency" value="Meridian Crisis Advisors" />
+    </div>
+    <div class="field-row">
+      <label class="field-label">클라이언트사</label>
+      <input type="text" id="input-client" value="Northwind Airlines" />
+    </div>
+    <div class="field-row">
+      <label class="field-label">시나리오</label>
+      <select id="input-scenario">
+        <option value="united_like">Viral Passenger Removal Crisis (airline)</option>
+        <option value="starbucks_like">Frontline Bias Incident (retail)</option>
+        <option value="recall_like">Product Safety Recall (consumer product)</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <label class="field-label">이번 워크숍에 참여하는 역할 (클릭하여 선택, 최소 2개)</label>
+      <div class="role-chip-row" id="role-chip-row">
+        <span class="role-chip active" data-role="CEO">CEO</span>
+        <span class="role-chip active" data-role="PR">PR</span>
+        <span class="role-chip active" data-role="Legal">Legal</span>
+        <span class="role-chip" data-role="IR">IR</span>
+        <span class="role-chip" data-role="HR">HR</span>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="startWorkshop()">워크숍 시작 — 퍼실리테이터 콘솔로</button>
+  </div>
+</div>
+
+<!-- SCREEN 2: FACILITATOR CONSOLE / CRISIS ROOM -->
+<div class="screen" id="screen-console">
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="phase-badge" id="phase-badge"></div>
+
+  <div class="console-grid">
+    <div>
+      <div class="card">
+        <div style="font-weight:600; margin-bottom:10px; font-size:13px;">역할별 제출 현황 <span style="color:var(--muted); font-weight:400;">(퍼실리테이터 뷰)</span></div>
+        <div id="role-status-list"></div>
+        <button class="btn-secondary" id="force-advance-btn" onclick="forceAdvance()" style="margin-left:0;">전체 미제출이어도 강제 진행</button>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:600; margin-bottom:10px; font-size:13px;">위기 상황판</div>
+        <div class="scoreboard" id="scoreboard"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="role-active-banner">현재 입력 역할: <b id="active-role-label"></b> — 같은 화면에서 역할을 전환하며 각자 입력하세요 (실제 워크숍에서는 참가자별 디바이스).</div>
+        <div style="font-size:12px; color:var(--muted); margin-bottom:6px;">상황</div>
+        <div id="context-text" style="white-space:pre-wrap; line-height:1.6; font-size:13.5px; margin-bottom:14px;"></div>
+
+        <div style="font-weight:600; margin-bottom:4px;" id="decision-label"></div>
+        <div class="options" id="option-list"></div>
+        <textarea id="freetext" placeholder="또는 직접 대응 문안을 입력하세요..." style="margin-top:10px; min-height:56px;"></textarea>
+        <button class="btn-primary" id="submit-btn" onclick="submitFreetext()">이 역할로 제출</button>
+
+        <div class="loading-row hidden" id="loading-row"><div class="spinner"></div> 교차 평가 중...</div>
+      </div>
+
+      <div class="card hidden" id="feedback-card">
+        <div style="display:flex; align-items:baseline; gap:10px;">
+          <div class="feedback-score" id="feedback-score"></div>
+          <div style="color:var(--muted); font-size:13px;">/ 100 combined decision quality</div>
+        </div>
+
+        <div id="coherence-flags"></div>
+
+        <div style="font-weight:600; font-size:13px; margin:10px 0 4px;">제출된 역할별 발언</div>
+        <div id="role-decisions-list"></div>
+
+        <div style="font-weight:600; font-size:13px; color:var(--good); margin-top:12px;">강점</div>
+        <ul class="tag-list strength" id="strengths-list"></ul>
+        <div style="font-weight:600; font-size:13px; color:var(--bad);">약점</div>
+        <ul class="tag-list weakness" id="weaknesses-list"></ul>
+        <div style="font-weight:600; font-size:13px; margin-bottom:4px;">이해관계자 반응</div>
+        <div id="quote-list"></div>
+
+        <button class="btn-primary" onclick="nextPhase()" id="next-phase-btn">다음 국면으로</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: BRANDED DEBRIEF REPORT -->
+<div class="screen" id="screen-report">
+  <div class="card">
+    <div class="report-header">
+      <div class="report-agency-logo" id="report-agency-logo">A</div>
+      <div>
+        <div class="report-title" id="report-title"></div>
+        <div class="report-sub" id="report-sub"></div>
+      </div>
+    </div>
+
+    <div style="font-size:12px; color:var(--muted); margin-top:6px;">국면별 의사결정 품질</div>
+    <div class="timeline-chart" id="timeline-chart"></div>
+    <div class="timeline-labels" id="timeline-labels"></div>
+
+    <div style="font-size:12px; color:var(--muted); margin-top:18px; margin-bottom:6px;">역할별 기여도</div>
+    <table class="role-score-table">
+      <thead><tr><th>역할</th><th>제출 건수</th><th>평균 코멘트</th></tr></thead>
+      <tbody id="role-score-tbody"></tbody>
+    </table>
+
+    <div style="font-size:12px; color:var(--muted); margin-top:18px;">실제 사례와 비교</div>
+    <div class="diff-box" id="real-case-diff"></div>
+
+    <div class="pdf-note">📄 이 화면이 PDF 내보내기의 기반이 됩니다 — 에이전시 로고/브랜드 컬러가 자동 반영되고, 클라이언트사에 전달하는 최종 산출물(deliverable)로 사용됩니다.</div>
+
+    <button class="btn-primary" onclick="location.reload()">새 워크숍 시작</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const SCENARIOS = {
+  united_like: {
+    title: "Viral Passenger Removal Crisis",
+    referenceCase: "United Airlines, 2017",
+    initial_context: `승객 강제 하차 영상이 X와 TikTok에서 확산되고 있다.\n2시간 만에 조회수 450만 회.\n피해자는 병원 진료가 필요한 상태.\nCEO는 아직 보고받지 않았다.\n언론은 "회사 입장"을 요구하고 있다.`,
+    optionsByRole: {
+      CEO: [
+        { key: "A", label: "사실관계 확인 전까지 무대응", quality: 25 },
+        { key: "B", label: "직접 영상 메시지로 피해자에게 공개 사과", quality: 85 },
+      ],
+      PR: [
+        { key: "A", label: "운영상 불가피했다는 입장문 발표", quality: 35 },
+        { key: "B", label: "유감 표명 및 조사 착수 발표, 추가 정보 약속", quality: 80 },
+      ],
+      Legal: [
+        { key: "A", label: "어떤 표현도 책임 인정으로 해석되지 않도록 '노 코멘트'", quality: 20 },
+        { key: "B", label: "사실관계 조사 협조와 보상 검토 의사를 함께 표명", quality: 78 },
+      ],
+      IR: [
+        { key: "A", label: "투자자에게 별도 커뮤니케이션 없이 평소대로 진행", quality: 30 },
+        { key: "B", label: "단기 리스크 요인을 투명하게 공시 자료에 반영", quality: 75 },
+      ],
+      HR: [
+        { key: "A", label: "현장 직원 대응 가이드 미배포, 기존 매뉴얼 유지", quality: 28 },
+        { key: "B", label: "전 직원에게 상황 설명과 응대 가이드를 즉시 공유", quality: 82 },
+      ],
+    },
+    tags: ["viral_video", "injured_victim", "ceo_apology_pressure"],
+  },
+  starbucks_like: {
+    title: "Frontline Bias Incident",
+    referenceCase: "Starbucks, 2018",
+    initial_context: `매장 직원이 특정 인종 고객을 신고해 경찰이 출동, 체포 장면이 영상으로 확산 중.\nSNS에서 불매운동 해시태그가 트렌드에 진입.\n다른 매장 직원들은 "본사 지침이 없다"고 답변 중.`,
+    optionsByRole: {
+      CEO: [
+        { key: "A", label: "해당 매장 직원의 개인 일탈로 규정", quality: 22 },
+        { key: "B", label: "전사 차원의 공개 사과와 편견 교육 시행 발표", quality: 88 },
+      ],
+      PR: [
+        { key: "A", label: "법적 책임 검토 후 1주일 내 입장 발표", quality: 30 },
+        { key: "B", label: "즉시 공개 사과문 배포 및 추가 정보 채널 안내", quality: 84 },
+      ],
+      Legal: [
+        { key: "A", label: "내부 조사 결과 발표까지 비공개 유지", quality: 28 },
+        { key: "B", label: "조사 착수를 공개하되 법적 노출 표현은 자제", quality: 76 },
+      ],
+      IR: [
+        { key: "A", label: "이슈가 단기적이라 보고 별도 대응 없음", quality: 32 },
+        { key: "B", label: "브랜드 리스크 영향 평가를 투자자에 선제 공유", quality: 74 },
+      ],
+      HR: [
+        { key: "A", label: "기존 매장 운영 지침 유지", quality: 25 },
+        { key: "B", label: "전 매장 대상 긴급 편견 교육 일정 공지", quality: 86 },
+      ],
+    },
+    tags: ["frontline_employee", "social_identity_issue", "brand_promise_conflict"],
+  },
+  recall_like: {
+    title: "Product Safety Recall",
+    referenceCase: "Tylenol 1982 / Note7 2016",
+    initial_context: `제품 결함으로 인한 화재/오염 신고가 복수 국가에서 동시에 접수됨.\n규제기관이 자발적 리콜 여부를 묻고 있음.\n일부 매장은 이미 자체적으로 판매를 중단함.`,
+    optionsByRole: {
+      CEO: [
+        { key: "A", label: "추가 조사 완료 전까지 판매 유지", quality: 18 },
+        { key: "B", label: "전 세계 자발적 리콜 즉시 발표", quality: 90 },
+      ],
+      PR: [
+        { key: "A", label: "결함을 공급업체 책임으로 발표", quality: 25 },
+        { key: "B", label: "소비자 안전 최우선 메시지로 즉시 공지", quality: 85 },
+      ],
+      Legal: [
+        { key: "A", label: "문제 지역에서만 한정적으로 리콜", quality: 45 },
+        { key: "B", label: "전 지역 리콜과 환불/교환 절차 동시 발표", quality: 80 },
+      ],
+      IR: [
+        { key: "A", label: "리콜 비용 영향을 공시에서 보류", quality: 30 },
+        { key: "B", label: "리콜 비용과 예상 영향을 즉시 공시", quality: 78 },
+      ],
+      HR: [
+        { key: "A", label: "콜센터 인력 충원 없이 기존 인원으로 대응", quality: 28 },
+        { key: "B", label: "고객 응대 인력 즉시 증원 및 교육", quality: 80 },
+      ],
+    },
+    tags: ["product_safety", "global_recall", "consumer_harm"],
+  },
+};
+
+const PHASES = ["0h_detection", "2h_initial_response", "6h_media_escalation", "24h_regulatory_attention"];
+const INITIAL_SCORES = { reputation: 70, legal_risk: 30, media_pressure: 40, employee_trust: 60, regulatory_risk: 30, financial_risk: 25 };
+const SCORE_META = {
+  reputation: { label: "Reputation", goodHigh: true },
+  legal_risk: { label: "Legal Risk", goodHigh: false },
+  media_pressure: { label: "Media Pressure", goodHigh: false },
+  employee_trust: { label: "Employee Trust", goodHigh: true },
+  regulatory_risk: { label: "Regulatory Risk", goodHigh: false },
+  financial_risk: { label: "Financial Risk", goodHigh: false },
+};
+
+let state = null;
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+document.querySelectorAll("#role-chip-row .role-chip").forEach(chip => {
+  chip.onclick = () => chip.classList.toggle("active");
+});
+
+function startWorkshop() {
+  const agency = document.getElementById("input-agency").value.trim() || "Agency";
+  const client = document.getElementById("input-client").value.trim() || "Client";
+  const scenarioKey = document.getElementById("input-scenario").value;
+  const roles = [...document.querySelectorAll("#role-chip-row .role-chip.active")].map(c => c.dataset.role);
+
+  if (roles.length < 2) { alert("최소 2개 역할을 선택하세요."); return; }
+
+  document.getElementById("agency-name").textContent = `${agency} — Facilitator Console`;
+  document.getElementById("agency-logo").textContent = agency[0].toUpperCase();
+  document.getElementById("report-agency-logo").textContent = agency[0].toUpperCase();
+
+  state = {
+    agency, client, scenarioKey,
+    roles,
+    activeRoleIndex: 0,
+    phaseIndex: 0,
+    scores: { ...INITIAL_SCORES },
+    decisionHistory: [],
+    phaseSubmissions: {},
+    currentContext: SCENARIOS[scenarioKey].initial_context,
+    roleStats: {},
+  };
+  roles.forEach(r => state.roleStats[r] = { count: 0 });
+
+  showScreen("screen-console");
+  renderPhase();
+}
+
+function renderPhase() {
+  const scenario = SCENARIOS[state.scenarioKey];
+  document.getElementById("progress-fill").style.width = `${(state.phaseIndex / PHASES.length) * 100}%`;
+  document.getElementById("phase-badge").textContent = `Phase ${state.phaseIndex + 1}/${PHASES.length} — ${PHASES[state.phaseIndex]} · ${state.client}`;
+  document.getElementById("context-text").textContent = state.currentContext;
+  state.phaseSubmissions[PHASES[state.phaseIndex]] = state.phaseSubmissions[PHASES[state.phaseIndex]] || {};
+  state.activeRoleIndex = 0;
+
+  renderRoleStatus();
+  renderScoreboard();
+  renderActiveRoleInput();
+}
+
+function renderRoleStatus() {
+  const list = document.getElementById("role-status-list");
+  list.innerHTML = "";
+  const submitted = state.phaseSubmissions[PHASES[state.phaseIndex]] || {};
+  state.roles.forEach(role => {
+    const isSubmitted = !!submitted[role];
+    const row = document.createElement("div");
+    row.className = "role-status-row";
+    row.innerHTML = `<span class="role-status-name">${role}</span><span class="role-status-pill ${isSubmitted ? "pill-submitted" : "pill-pending"}">${isSubmitted ? "제출 완료" : "대기 중"}</span>`;
+    list.appendChild(row);
+  });
+}
+
+function pendingRoles() {
+  const submitted = state.phaseSubmissions[PHASES[state.phaseIndex]] || {};
+  return state.roles.filter(r => !submitted[r]);
+}
+
+function renderActiveRoleInput() {
+  const pending = pendingRoles();
+  const decisionCardVisible = pending.length > 0;
+  document.getElementById("feedback-card").classList.add("hidden");
+  document.querySelector("#screen-console .console-grid > div:nth-child(2) > .card:nth-child(2)").classList.toggle("hidden", !decisionCardVisible);
+
+  if (!decisionCardVisible) return;
+
+  const role = pending[0];
+  document.getElementById("active-role-label").textContent = role;
+  document.getElementById("decision-label").textContent = `${role}의 대응`;
+
+  const scenario = SCENARIOS[state.scenarioKey];
+  const opts = scenario.optionsByRole[role] || [];
+  const list = document.getElementById("option-list");
+  list.innerHTML = "";
+  opts.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.innerHTML = `<b>${opt.key}.</b>${opt.label}`;
+    btn.onclick = () => submitRoleDecision(role, opt.label, opt.quality);
+    list.appendChild(btn);
+  });
+  document.getElementById("freetext").value = "";
+  setSubmitting(false);
+}
+
+function setSubmitting(isSubmitting) {
+  document.querySelectorAll(".option-btn").forEach(b => b.disabled = isSubmitting);
+  document.getElementById("submit-btn").disabled = isSubmitting;
+  document.getElementById("freetext").disabled = isSubmitting;
+  document.getElementById("loading-row").classList.toggle("hidden", !isSubmitting);
+}
+
+function submitFreetext() {
+  const pending = pendingRoles();
+  if (!pending.length) return;
+  const text = document.getElementById("freetext").value.trim();
+  if (!text) { alert("대응 문안을 입력하거나 선택지를 클릭하세요."); return; }
+  submitRoleDecision(pending[0], text, undefined);
+}
+
+function submitRoleDecision(role, text, quality) {
+  const phase = PHASES[state.phaseIndex];
+  state.phaseSubmissions[phase][role] = { text, quality };
+  state.roleStats[role].count += 1;
+  renderRoleStatus();
+
+  if (pendingRoles().length > 0) {
+    renderActiveRoleInput();
+    return;
+  }
+  runPhaseEvaluation();
+}
+
+function forceAdvance() {
+  if (pendingRoles().length === 0) { runPhaseEvaluation(); return; }
+  if (!confirm(`${pendingRoles().join(", ")} 역할이 아직 제출하지 않았습니다. 그래도 진행할까요?`)) return;
+  runPhaseEvaluation();
+}
+
+function mockEvaluate(combinedDecisions) {
+  let quality = 50;
+  let coherenceFlags = [];
+  const positive = ["사과", "사죄", "조사", "재발방지", "보상", "리콜", "책임", "협력", "공개"];
+  const negative = ["무대응", "부인", "불가피", "규정대로", "비공개", "책임 없", "거부", "노 코멘트", "유지"];
+  const texts = Object.values(combinedDecisions).map(d => d.quality !== undefined ? null : d.text).filter(Boolean);
+  const qualities = Object.values(combinedDecisions).map(d => d.quality).filter(q => q !== undefined);
+
+  if (qualities.length) {
+    quality = Math.round(qualities.reduce((a, b) => a + b, 0) / qualities.length);
+  } else {
+    texts.forEach(t => {
+      positive.forEach(w => { if (t.includes(w)) quality += 5; });
+      negative.forEach(w => { if (t.includes(w)) quality -= 6; });
+    });
+    quality = Math.max(5, Math.min(95, quality));
+  }
+
+  const legalText = combinedDecisions["Legal"] && combinedDecisions["Legal"].text;
+  const prText = combinedDecisions["PR"] && combinedDecisions["PR"].text;
+  if (legalText && prText) {
+    const legalSilent = /비공개|노 코멘트|책임 없/.test(legalText);
+    const prApologizes = /사과|사죄|공개/.test(prText);
+    if (legalSilent && prApologizes) {
+      coherenceFlags.push("Legal의 '비공개/무책임' 입장이 PR의 공개 사과와 상충합니다 — 클라이언트 워크숍에서 토론할 핵심 포인트.");
+      quality -= 8;
+    }
+  }
+
+  const goodness = (quality - 50) / 50;
+  return {
+    decision_quality: Math.max(5, Math.round(quality)),
+    reputation_delta: Math.round(goodness * 14),
+    legal_risk_delta: Math.round(-goodness * 10),
+    media_pressure_delta: Math.round(-goodness * 12 + (quality < 40 ? 6 : 0)),
+    employee_trust_delta: Math.round(goodness * 8),
+    regulatory_risk_delta: Math.round(-goodness * 9),
+    financial_risk_delta: Math.round(-goodness * 6),
+    coherence_flags: coherenceFlags,
+    strengths: quality >= 60 ? ["역할 간 메시지 일관성 확보", "피해자/고객 중심 표현이 포함됨"] : (quality >= 40 ? ["초기 대응 속도는 확보함"] : []),
+    weaknesses: quality < 60 ? ["역할 간 입장 조율이 부족함", "보상/재발방지 계획이 약함"] : (quality < 80 ? ["보상 원칙이 구체적이지 않음"] : []),
+    stakeholder_reactions: {
+      media: quality >= 60 ? "사과의 진정성은 인정하나 후속 조치를 지켜보겠다는 입장" : "대응이 늦거나 회피적이라는 비판 보도가 늘고 있음",
+      customers: quality >= 60 ? "피해자 보호 조치에 일부 안도하는 반응" : "신뢰 저하 및 불매 여론 확산",
+      regulators: quality >= 60 ? "자발적 조치를 긍정 평가, 경과 보고 요청" : "사실관계 보고와 제재 가능성을 시사",
+    },
+  };
+}
+
+function runPhaseEvaluation() {
+  setSubmitting(true);
+  setTimeout(() => {
+    const phase = PHASES[state.phaseIndex];
+    const decisions = state.phaseSubmissions[phase];
+    const evaluation = mockEvaluate(decisions);
+
+    state.decisionHistory.push({ phase, quality: evaluation.decision_quality, decisions });
+
+    Object.keys(SCORE_META).forEach(key => {
+      const delta = evaluation[key + "_delta"] || 0;
+      state.scores[key] = Math.max(0, Math.min(100, state.scores[key] + delta));
+    });
+
+    renderScoreboard(evaluation);
+    renderFeedback(evaluation, decisions);
+
+    document.querySelector("#screen-console .console-grid > div:nth-child(2) > .card:nth-child(2)").classList.add("hidden");
+    document.getElementById("feedback-card").classList.remove("hidden");
+
+    const isLast = state.phaseIndex >= PHASES.length - 1;
+    document.getElementById("next-phase-btn").textContent = isLast ? "워크숍 종료 — 리포트 보기" : "다음 국면으로";
+  }, 800);
+}
+
+function renderScoreboard(evaluation) {
+  const board = document.getElementById("scoreboard");
+  board.innerHTML = "";
+  Object.entries(state.scores).forEach(([key, value]) => {
+    const meta = SCORE_META[key];
+    const delta = evaluation ? evaluation[key + "_delta"] : null;
+    const barColor = meta.goodHigh ? (value >= 50 ? "#1a8a3d" : "#d92626") : (value <= 50 ? "#1a8a3d" : "#d92626");
+
+    let deltaHtml = "";
+    if (delta) {
+      const worse = meta.goodHigh ? delta < 0 : delta > 0;
+      const cls = worse ? "delta-up" : "delta-down";
+      const sign = delta > 0 ? "+" : "";
+      const arrow = delta > 0 ? "&#9650;" : "&#9660;";
+      deltaHtml = `<span class="score-delta ${cls}">${sign}${delta} ${arrow}</span>`;
+    }
+
+    const item = document.createElement("div");
+    item.className = "score-item" + (delta ? " delta-flash" : "");
+    item.innerHTML = `
+      <div class="score-label">${meta.label}</div>
+      <div class="score-value">${value}${deltaHtml}</div>
+      <div class="score-bar-bg"><div class="score-bar-fill" style="width:${value}%; background:${barColor};"></div></div>
+    `;
+    board.appendChild(item);
+  });
+}
+
+function renderFeedback(evaluation, decisions) {
+  document.getElementById("feedback-score").textContent = evaluation.decision_quality;
+  document.getElementById("feedback-score").style.color = evaluation.decision_quality >= 60 ? "var(--good)" : "var(--bad)";
+
+  const flagsEl = document.getElementById("coherence-flags");
+  flagsEl.innerHTML = "";
+  evaluation.coherence_flags.forEach(f => {
+    const div = document.createElement("div");
+    div.className = "coherence-flag";
+    div.innerHTML = `<span class="icon">⚠</span><span>${f}</span>`;
+    flagsEl.appendChild(div);
+  });
+
+  const rdList = document.getElementById("role-decisions-list");
+  rdList.innerHTML = "";
+  Object.entries(decisions).forEach(([role, d]) => {
+    const row = document.createElement("div");
+    row.className = "role-decision-row";
+    row.innerHTML = `<span class="role-decision-name">${role}</span><span>${d.text}</span>`;
+    rdList.appendChild(row);
+  });
+
+  document.getElementById("strengths-list").innerHTML = evaluation.strengths.map(s => `<li>${s}</li>`).join("") || "<li>—</li>";
+  document.getElementById("weaknesses-list").innerHTML = evaluation.weaknesses.map(s => `<li>${s}</li>`).join("") || "<li>—</li>";
+
+  const quoteList = document.getElementById("quote-list");
+  quoteList.innerHTML = "";
+  Object.entries(evaluation.stakeholder_reactions).forEach(([who, text]) => {
+    const row = document.createElement("div");
+    row.className = "quote-row";
+    row.innerHTML = `<span class="quote-name">${who}</span><span>"${text}"</span>`;
+    quoteList.appendChild(row);
+  });
+}
+
+function nextPhase() {
+  state.phaseIndex += 1;
+  if (state.phaseIndex >= PHASES.length) {
+    renderReport();
+    return;
+  }
+  renderPhase();
+}
+
+function renderReport() {
+  showScreen("screen-report");
+  const avgQuality = Math.round(state.decisionHistory.reduce((a, d) => a + d.quality, 0) / state.decisionHistory.length);
+  const scenario = SCENARIOS[state.scenarioKey];
+
+  document.getElementById("report-title").textContent = `${state.client} — Crisis Workshop Debrief`;
+  document.getElementById("report-sub").textContent = `Prepared by ${state.agency} · ${scenario.title} · 평균 품질 ${avgQuality}/100`;
+
+  const chart = document.getElementById("timeline-chart");
+  const labels = document.getElementById("timeline-labels");
+  chart.innerHTML = "";
+  labels.innerHTML = "";
+  state.decisionHistory.forEach(d => {
+    const bar = document.createElement("div");
+    bar.className = "timeline-bar";
+    bar.style.height = `${Math.max(6, d.quality)}%`;
+    bar.style.background = d.quality >= 60 ? "var(--good)" : "var(--bad)";
+    bar.title = `${d.phase}: ${d.quality}`;
+    chart.appendChild(bar);
+
+    const label = document.createElement("span");
+    label.textContent = d.phase.split("_")[0];
+    labels.appendChild(label);
+  });
+
+  const tbody = document.getElementById("role-score-tbody");
+  tbody.innerHTML = "";
+  state.roles.forEach(role => {
+    const allTexts = state.decisionHistory.map(d => d.decisions[role] && d.decisions[role].text).filter(Boolean);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${role}</td><td>${state.roleStats[role].count}</td><td style="color:var(--muted);">${allTexts[allTexts.length - 1] || "—"}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("real-case-diff").textContent =
+    `${state.client}의 평균 대응 품질은 ${avgQuality}점입니다. 참고 사례(${scenario.referenceCase})는 ` +
+    (avgQuality >= 60
+      ? "초기 사과는 늦었지만 장기적으로 보상과 정책 변경을 통해 신뢰를 회복했습니다. 이번 워크숍 참가팀은 역할 간 조율을 통해 더 빠르게 일관된 대응을 했습니다."
+      : "유사하게 역할 간 메시지 불일치로 여론이 악화된 적이 있습니다. 다음 세션에서는 Legal-PR 조율 절차를 사전에 합의해보세요.");
+}
+</script>
+</body>
+</html>
