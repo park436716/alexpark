@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Performance Review Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Trading Performance Review Dashboard</h1>
+  <nav id="tabs">
+    <button class="tab-btn active" data-tab="weekly">Weekly Review</button>
+    <button class="tab-btn" data-tab="monthly">Monthly Review</button>
+    <button class="tab-btn" data-tab="framework">Setups &amp; Tags</button>
+    <button class="tab-btn" data-tab="dashboard">Pattern Dashboard</button>
+    <button class="tab-btn" data-tab="analysis">AI Analysis</button>
+    <button class="tab-btn" data-tab="settings">Settings</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- WEEKLY -->
+  <section id="tab-weekly" class="tab-panel active">
+    <h2>Weekly Review</h2>
+    <div class="field-row">
+      <label>Week
+        <select id="weekly-select"></select>
+      </label>
+      <label>Or pick a date to log a new week
+        <input type="date" id="weekly-date">
+      </label>
+      <button id="weekly-new-btn">New / Load</button>
+    </div>
+
+    <form id="weekly-form">
+      <input type="hidden" id="weekly-label">
+      <p class="week-range" id="weekly-range"></p>
+
+      <label class="q">1. What did I do well?
+        <textarea id="weekly-well" rows="3"></textarea>
+      </label>
+      <label class="q">2. What did I struggle with?
+        <textarea id="weekly-struggle" rows="3"></textarea>
+      </label>
+      <label class="q">3. How do I plan to improve for next week?
+        <textarea id="weekly-improve" rows="3"></textarea>
+      </label>
+
+      <div class="tag-block">
+        <h3>Setups traded this week (tag + net R)</h3>
+        <div id="weekly-setups-list" class="chip-input-list"></div>
+      </div>
+
+      <div class="tag-block">
+        <h3>Mistakes made this week (by lifecycle phase)</h3>
+        <div id="weekly-mistakes-list"></div>
+      </div>
+
+      <button type="submit">Save Weekly Review</button>
+      <span id="weekly-saved-msg" class="saved-msg"></span>
+    </form>
+  </section>
+
+  <!-- MONTHLY -->
+  <section id="tab-monthly" class="tab-panel">
+    <h2>Monthly Review</h2>
+    <div class="field-row">
+      <label>Month
+        <select id="monthly-select"></select>
+      </label>
+      <label>Or pick a month
+        <input type="month" id="monthly-date">
+      </label>
+      <button id="monthly-new-btn">New / Load</button>
+    </div>
+
+    <form id="monthly-form">
+      <input type="hidden" id="monthly-label">
+
+      <div id="monthly-scorecard" class="scorecard"></div>
+
+      <label class="q">1. Best / worst performing trade setups
+        <textarea id="monthly-setups" rows="3"></textarea>
+      </label>
+      <label class="q">2. Most common mistakes this month
+        <textarea id="monthly-mistakes" rows="3"></textarea>
+      </label>
+      <label class="q">3. How do I adjust my process to minimize them?
+        <textarea id="monthly-adjust" rows="3"></textarea>
+      </label>
+
+      <button type="submit">Save Monthly Review</button>
+      <span id="monthly-saved-msg" class="saved-msg"></span>
+    </form>
+  </section>
+
+  <!-- FRAMEWORK -->
+  <section id="tab-framework" class="tab-panel">
+    <h2>Setups &amp; Mistake Tags</h2>
+    <p class="hint">Editable framework used across all reviews. Where you fail (phase) matters as much as how you fail (mistake).</p>
+
+    <div class="framework-block">
+      <h3>Setups</h3>
+      <ul id="setups-list" class="editable-list"></ul>
+      <div class="add-row">
+        <input type="text" id="new-setup-input" placeholder="New setup name">
+        <button id="add-setup-btn">Add</button>
+      </div>
+    </div>
+
+    <div class="framework-block">
+      <h3>Mistake Tags by Trade Lifecycle Phase</h3>
+      <div id="phases-container"></div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="tab-dashboard" class="tab-panel">
+    <h2>Pattern Dashboard</h2>
+
+    <div class="dash-block">
+      <h3>Active Streaks</h3>
+      <p class="hint">Tags flagged when present in 2 or more most-recent consecutive logged weeks.</p>
+      <div id="streaks-list"></div>
+    </div>
+
+    <div class="dash-block">
+      <h3>Punch-Card: Tags &times; Weeks</h3>
+      <div id="punchcard-wrap" class="table-scroll"></div>
+    </div>
+
+    <div class="dash-block">
+      <h3>Setup Scorecard (Net R by Month)</h3>
+      <div id="setup-scorecard-wrap" class="table-scroll"></div>
+    </div>
+  </section>
+
+  <!-- ANALYSIS -->
+  <section id="tab-analysis" class="tab-panel">
+    <h2>AI Pattern Analysis</h2>
+    <p class="hint">Sends every saved weekly &amp; monthly review to Claude and asks for the 3-5 strongest patterns &mdash; especially contradictions between your stated improvement plans and your later behavior.</p>
+    <button id="analyze-btn">Analyze Patterns with Claude</button>
+    <div id="analysis-status" class="hint"></div>
+    <div id="analysis-result"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-settings" class="tab-panel">
+    <h2>Settings</h2>
+    <label class="q">Anthropic API Key
+      <input type="password" id="api-key-input" placeholder="sk-ant-...">
+    </label>
+    <p class="hint">Stored only in this browser's localStorage. Used only for direct client-side calls to the Anthropic Messages API when you click "Analyze Patterns with Claude". Never sent anywhere else.</p>
+    <label class="q">Model
+      <select id="model-select">
+        <option value="claude-sonnet-5">claude-sonnet-5</option>
+        <option value="claude-opus-4-8">claude-opus-4-8</option>
+        <option value="claude-haiku-4-5-20251001">claude-haiku-4-5-20251001</option>
+      </select>
+    </label>
+    <button id="save-settings-btn">Save Settings</button>
+    <span id="settings-saved-msg" class="saved-msg"></span>
+
+    <hr>
+    <h3>Data</h3>
+    <button id="export-btn">Export JSON</button>
+    <button id="import-btn">Import JSON</button>
+    <input type="file" id="import-file" accept="application/json" style="display:none">
+    <button id="reset-btn" class="danger">Reset All Data</button>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
