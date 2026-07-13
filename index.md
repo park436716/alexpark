@@ -32,6 +32,12 @@ _(empty — add papers here)_
 
 _(empty — add papers here)_
 
+## intellectual-property (지적재산권법)
+
+- [[intellectual-property/stein-2025-in-re-openai-copyright-litigation]] — S.D.N.Y. Stein J. denies OpenAI motion to dismiss output-based infringement (MDL 25-md-3143, 2025)
+- [[intellectual-property/stein-2025-in-re-openai-copyright-litigation-ko]] — Korean translation of the same opinion
+- [[intellectual-property/jurcys-2024-nyt-v-microsoft-openai-fair-use-ko]] — Jurcys & Fenwick case comment on NYT v. Microsoft/OpenAI complaint, Korean translation (2024)
+
 ## concepts
 
 _(empty — add doctrines, methods, comparative-law concepts here)_

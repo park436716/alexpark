@@ -44,6 +44,7 @@ alexpark/
     ├── civil-procedure/            # 민사소송법
     ├── criminal-procedure/         # 형사소송법
     ├── administrative-law/         # 행정법
+    ├── intellectual-property/      # 지적재산권법 (저작권, 상표, 특허)
     ├── concepts/                   # General doctrines, methods
     ├── overviews/                  # Synthesis pages (where compounding happens)
     └── other/                      # Cross-cutting, miscellaneous
@@ -76,6 +77,7 @@ Example: `kim-2020-constitutional-review-of-emergency-decree.pdf`
 | `civil-procedure` | 민사소송법 — Civil procedure, evidence, enforcement |
 | `criminal-procedure` | 형사소송법 — Criminal procedure, investigation, trial, evidence |
 | `administrative-law` | 행정법 — Administrative law, administrative litigation, regulatory law |
+| `intellectual-property` | 지적재산권법 — Copyright (저작권), trademark (상표), patent (특허), AI & IP |
 | `concepts` | Key doctrines, interpretive methods, comparative law concepts |
 | `overviews` | Synthesis pages spanning multiple papers |
 | `other` | Cross-cutting, international law, legal philosophy, miscellaneous |
