@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "chargeback-ai": {
+      "source": {
+        "source": "github",
+        "repo": "go-canonical/chargeback-ai"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "chargeback-ai@chargeback-ai": true
+  }
+}
