@@ -21,3 +21,11 @@ venv/
 # Optional: keep PDFs out of git if they are large or copyrighted.
 # Uncomment the next line to ignore PDFs.
 # papers/*.pdf
+
+# Node / Astro
+node_modules/
+dist/
+.astro/
+.env
+.env.local
+npm-debug.log*

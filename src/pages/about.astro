@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About" description="이 사이트에 관하여" activeNav="about">
+  <div class="page-title-block">
+    <h1>About</h1>
+    <p class="desc">이 사이트에 관하여.</p>
+  </div>
+
+  <div class="post-content">
+    <p>
+      안녕하세요. 한국 로스쿨 학습을 위한 개인 위키 겸 블로그입니다.
+      원본 PDF → LLM 요약(<code>sources/</code>) → 위키 페이지(<code>wiki/</code>) 세 단계로
+      논문·판례·개념을 정리합니다.
+    </p>
+
+    <h2>네 가지 원칙</h2>
+    <ol>
+      <li><strong>웹 검색 금지</strong> — 위키 안에 실제로 있는 자료만 근거로 삼습니다.</li>
+      <li><strong>위키에서 먼저 답한다</strong> — <code>sources/</code>와 <code>wiki/</code>가 유일한 근거입니다.</li>
+      <li><strong>위키가 부족하면 PDF를 다시 읽는다</strong> — 그리고 위키를 업데이트합니다.</li>
+      <li><strong>관련 논문이 없으면 없다고 말한다</strong> — 즉흥적으로 답을 만들지 않습니다.</li>
+    </ol>
+
+    <h2>연락</h2>
+    <p>이메일: <a href="mailto:alexpark4367@gmail.com">alexpark4367@gmail.com</a></p>
+  </div>
+</BaseLayout>

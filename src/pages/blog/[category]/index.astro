@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostRow from '../../../components/PostRow.astro';
+import { categories, getCategory } from '../../../lib/categories';
+import { getPostsByCategory } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  return categories.map((c) => ({ params: { category: c.slug } }));
+}
+
+const { category } = Astro.params;
+const meta = getCategory(category!);
+if (!meta) {
+  throw new Error(`Unknown category: ${category}`);
+}
+const posts = await getPostsByCategory(meta.slug);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<BaseLayout title={`${meta.ko} · ${meta.en}`} description={meta.blurb} activeNav="blog">
+  <div class="breadcrumb">
+    <a href={`${base}/blog/`}>Blog</a>
+    <span class="sep">/</span>
+    <span>{meta.en}</span>
+  </div>
+  <div class="page-title-block">
+    <h1>{meta.ko} <span style="color: var(--fg-faint); font-family: var(--sans); font-weight: 400; font-size: 1.1rem; margin-left: 0.4rem;">{meta.en}</span></h1>
+    <p class="desc">{meta.blurb}</p>
+  </div>
+
+  {posts.length === 0 ? (
+    <p class="empty-note">이 카테고리에 아직 글이 없습니다.</p>
+  ) : (
+    <ul class="post-list">
+      {posts.map((post) => (
+        <li><PostRow post={post} /></li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>

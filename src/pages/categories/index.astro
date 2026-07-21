@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { categories } from '../../lib/categories';
+import { getPostsByCategory } from '../../lib/posts';
+
+const counts = await Promise.all(
+  categories.map(async (c) => ({ ...c, count: (await getPostsByCategory(c.slug)).length }))
+);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<BaseLayout title="Categories" description="법 분야별 카테고리" activeNav="categories">
+  <div class="page-title-block">
+    <h1>Categories</h1>
+    <p class="desc">법 분야 · 도그마틱 · 종합 정리.</p>
+  </div>
+  <ul class="categories-grid">
+    {counts.map((c) => (
+      <li>
+        <a class="cat-card" href={`${base}/blog/${c.slug}/`}>
+          <span class="ko">{c.ko}</span>
+          <span class="en">{c.en}</span>
+          <span class="blurb">{c.blurb}</span>
+          <span class="count">{c.count} posts</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

@@ -1,0 +1,23 @@
+---
+import type { Post } from '../lib/posts';
+import { categoryOf, slugOf } from '../lib/posts';
+import { getCategory } from '../lib/categories';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const cat = categoryOf(post);
+const meta = getCategory(cat);
+const slug = slugOf(post);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const href = `${base}/blog/${cat}/${slug}/`;
+const year = post.data.year ?? '';
+---
+
+<div class="post-row">
+  <span class="year">{year}</span>
+  <a class="title" href={href}>{post.data.title}</a>
+  <span class="cat">{meta ? meta.en : cat}</span>
+</div>

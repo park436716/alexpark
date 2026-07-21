@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostRow from '../../components/PostRow.astro';
+import { getAllPosts } from '../../lib/posts';
+
+const posts = await getAllPosts();
+---
+
+<BaseLayout title="Blog" description="전체 글 목록" activeNav="blog">
+  <div class="page-title-block">
+    <h1>All posts</h1>
+    <p class="desc">{posts.length}개의 글. 최신 연도순으로 정렬됩니다.</p>
+  </div>
+  {posts.length === 0 ? (
+    <p class="empty-note">아직 게시된 글이 없습니다.</p>
+  ) : (
+    <ul class="post-list">
+      {posts.map((post) => (
+        <li><PostRow post={post} /></li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>

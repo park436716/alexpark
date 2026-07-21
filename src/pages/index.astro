@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostRow from '../components/PostRow.astro';
+import { getAllPosts } from '../lib/posts';
+import { categories } from '../lib/categories';
+import { getPostsByCategory } from '../lib/posts';
+
+const posts = await getAllPosts();
+const recent = posts.slice(0, 7);
+
+const counts = await Promise.all(
+  categories.map(async (c) => ({ ...c, count: (await getPostsByCategory(c.slug)).length }))
+);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<BaseLayout title="Alex Park — 로스쿨 노트" activeNav="home">
+  <section class="hero">
+    <h1>로스쿨 노트</h1>
+    <p>
+      한국 로스쿨 학습을 위한 개인 위키 겸 블로그.
+      논문 요약, 판례 노트, 교리 종합. 매 대화가 위키를 갱신하고,
+      갱신된 위키가 다음 답변의 근거가 되는 <em>지식 축적</em> 구조입니다.
+    </p>
+  </section>
+
+  <section>
+    <div class="section-title">
+      <h2>Recent</h2>
+      <a class="more" href={`${base}/blog/`}>All posts →</a>
+    </div>
+    {recent.length === 0 ? (
+      <p class="empty-note">아직 게시된 글이 없습니다.</p>
+    ) : (
+      <ul class="post-list">
+        {recent.map((post) => (
+          <li><PostRow post={post} /></li>
+        ))}
+      </ul>
+    )}
+  </section>
+
+  <section>
+    <div class="section-title">
+      <h2>Categories</h2>
+      <a class="more" href={`${base}/categories/`}>Browse all →</a>
+    </div>
+    <ul class="categories-grid">
+      {counts.map((c) => (
+        <li>
+          <a class="cat-card" href={`${base}/blog/${c.slug}/`}>
+            <span class="ko">{c.ko}</span>
+            <span class="en">{c.en}</span>
+            <span class="blurb">{c.blurb}</span>
+            <span class="count">{c.count} posts</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
