@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 카드 견적 데모 · v5 · static</title>
+</head>
+<body>
+<title>AI 카드 맞춤 견적 · 데모</title>
+<style>
+  :root{
+    --ground:#F7F7F4;
+    --panel:#FFFFFF;
+    --ink:#0B0C10;
+    --ink-soft:#2A2D34;
+    --mute:#5B616E;
+    --hair:#E4E2DA;
+    --hair-strong:#CFCCC0;
+    --accent:#2340FF;
+    --accent-ink:#FFFFFF;
+    --accent-wash:#EDEEFF;
+    --good:#0F8A5F;
+    --good-wash:#E4F3EC;
+    --warn:#B67300;
+    --warn-wash:#FBF1DE;
+    --shadow: 0 1px 0 rgba(11,12,16,.04), 0 8px 32px -12px rgba(11,12,16,.08);
+  --copyright:#D62828;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#0B0C10;
+      --panel:#14161C;
+      --ink:#F5F4EF;
+      --ink-soft:#D6D4CB;
+      --mute:#8A8F9B;
+      --hair:#22252D;
+      --hair-strong:#333844;
+      --accent:#5A73FF;
+      --accent-ink:#0B0C10;
+      --accent-wash:#171B33;
+      --good:#37C08F;
+      --good-wash:#0F2019;
+      --warn:#E5A845;
+      --warn-wash:#22190A;
+      --shadow: 0 1px 0 rgba(0,0,0,.4), 0 12px 40px -12px rgba(0,0,0,.6);
+      --copyright:#FF5A5A;
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#F7F7F4; --panel:#FFFFFF; --ink:#0B0C10; --ink-soft:#2A2D34;
+    --mute:#5B616E; --hair:#E4E2DA; --hair-strong:#CFCCC0;
+    --accent:#2340FF; --accent-ink:#FFFFFF; --accent-wash:#EDEEFF;
+    --good:#0F8A5F; --good-wash:#E4F3EC; --warn:#B67300; --warn-wash:#FBF1DE;
+    --shadow: 0 1px 0 rgba(11,12,16,.04), 0 8px 32px -12px rgba(11,12,16,.08);
+    --copyright:#D62828;
+  }
+  :root[data-theme="dark"]{
+    --ground:#0B0C10; --panel:#14161C; --ink:#F5F4EF; --ink-soft:#D6D4CB;
+    --mute:#8A8F9B; --hair:#22252D; --hair-strong:#333844;
+    --accent:#5A73FF; --accent-ink:#0B0C10; --accent-wash:#171B33;
+    --good:#37C08F; --good-wash:#0F2019; --warn:#E5A845; --warn-wash:#22190A;
+    --shadow: 0 1px 0 rgba(0,0,0,.4), 0 12px 40px -12px rgba(0,0,0,.6);
+    --copyright:#FF5A5A;
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+
+  /* Copyright bar */
+  .copyright-bar{
+    background:var(--copyright); color:#FFFFFF;
+    text-align:center; padding:8px 16px;
+    font-size:12px; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    border-bottom:1px solid rgba(0,0,0,.15);
+  }
+  .copyright-bar .sep{ opacity:.55; margin:0 10px; }
+  body{
+    background:var(--ground);
+    color:var(--ink);
+    font-family:"Apple SD Gothic Neo","Pretendard","Malgun Gothic",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-feature-settings:"ss01","kern";
+    -webkit-font-smoothing:antialiased;
+    line-height:1.55;
+    font-size:15.5px;
+    letter-spacing:-0.005em;
+  }
+  .num{ font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+  .wrap{ max-width:960px; margin:0 auto; padding:32px 24px 96px; }
+
+  /* Header */
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 0 40px; border-bottom:1px solid var(--hair); margin-bottom:56px;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; font-weight:600; }
+  .brand-mark{
+    width:28px; height:28px; border-radius:6px;
+    background:var(--ink); color:var(--ground);
+    display:grid; place-items:center; font-weight:700; font-size:13px;
+    letter-spacing:-.04em;
+  }
+  .brand-name{ font-size:15px; letter-spacing:-.01em; }
+  .brand-name em{ font-style:normal; color:var(--mute); font-weight:400; margin-left:6px; }
+  .theme-toggle{
+    background:transparent; border:1px solid var(--hair-strong); color:var(--ink);
+    padding:6px 12px; border-radius:999px; font-size:12px; cursor:pointer;
+    letter-spacing:.04em; text-transform:uppercase; font-family:inherit;
+  }
+  .theme-toggle:hover{ border-color:var(--ink); }
+
+  /* Hero */
+  .hero{ margin-bottom:64px; }
+  .eyebrow{
+    font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--mute); font-weight:500; margin-bottom:20px;
+  }
+  h1{
+    font-size:clamp(38px,5.6vw,58px); line-height:1.05; margin:0 0 24px;
+    font-weight:700; letter-spacing:-.028em; text-wrap:balance; max-width:820px;
+  }
+  h1 .rule{ display:block; height:1px; background:var(--ink); width:64px; margin:28px 0 0; }
+  .lede{
+    font-size:18px; color:var(--ink-soft); max-width:640px;
+    line-height:1.55; text-wrap:pretty;
+  }
+
+  /* Section headers */
+  .sec{ margin-top:80px; }
+  .sec-head{
+    display:flex; align-items:baseline; gap:16px; margin-bottom:24px;
+    border-bottom:1px solid var(--hair); padding-bottom:12px;
+  }
+  .sec-num{
+    font-size:11px; letter-spacing:.16em; color:var(--mute); font-weight:600;
+    font-family:ui-monospace,monospace;
+  }
+  .sec-title{ font-size:22px; font-weight:600; letter-spacing:-.015em; margin:0; }
+
+  /* Input panel */
+  .panel{
+    background:var(--panel); border:1px solid var(--hair);
+    padding:32px; box-shadow:var(--shadow);
+  }
+  .field{ margin-bottom:24px; }
+  .field:last-child{ margin-bottom:0; }
+  .field-label{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin-bottom:10px;
+  }
+  .field-label .name{ font-weight:500; font-size:14px; color:var(--ink); }
+  .field-label .value{
+    color:var(--ink); font-weight:600; font-size:15px;
+  }
+
+  input[type=range]{
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:2px; background:var(--hair-strong);
+    outline:none; border-radius:0;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:16px; height:16px; border-radius:50%;
+    background:var(--accent); cursor:grab; border:3px solid var(--panel);
+    box-shadow:0 0 0 1px var(--accent);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px; height:16px; border-radius:50%;
+    background:var(--accent); cursor:grab; border:3px solid var(--panel);
+    box-shadow:0 0 0 1px var(--accent);
+  }
+  input[type=range]:focus-visible::-webkit-slider-thumb{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .cat-groups{ display:flex; flex-direction:column; gap:22px; padding-top:8px; }
+  .cat-group{ }
+  .cat-group-label{
+    font-size:10px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--mute); font-weight:600; margin-bottom:12px;
+    padding-bottom:6px; border-bottom:1px solid var(--hair);
+  }
+  .cat-group-items{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:16px 28px;
+  }
+  @media (max-width:820px){ .cat-group-items{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:520px){ .cat-group-items{ grid-template-columns:1fr; } }
+  .cat-total{
+    font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--mute); margin-top:14px; text-align:right;
+  }
+  .cat-total.warn{ color:var(--warn); }
+
+  /* Pipeline */
+  .pipe{
+    display:grid; grid-template-columns:repeat(6,1fr); gap:1px;
+    background:var(--hair); border:1px solid var(--hair); margin-top:16px;
+  }
+  .pipe-step{
+    background:var(--panel); padding:18px 14px; min-height:110px;
+    display:flex; flex-direction:column; justify-content:space-between;
+    position:relative;
+  }
+  .pipe-step .n{
+    font-size:10px; letter-spacing:.16em; color:var(--mute); font-weight:600;
+    font-family:ui-monospace,monospace;
+  }
+  .pipe-step .t{ font-size:13px; font-weight:500; margin-top:6px; line-height:1.3; }
+  .pipe-step .out{
+    font-size:12px; color:var(--mute); font-family:ui-monospace,monospace;
+    margin-top:auto; padding-top:8px;
+  }
+  .pipe-step.on .out{ color:var(--accent); }
+  .pipe-step.on::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:2px;
+    background:var(--accent);
+  }
+  @media (max-width:720px){
+    .pipe{ grid-template-columns:repeat(2,1fr); }
+    .pipe-step{ min-height:90px; }
+    .categories{ grid-template-columns:1fr; gap:18px; }
+    h1{ font-size:36px; }
+  }
+
+  /* Compute button */
+  .compute{
+    margin-top:24px; display:flex; gap:12px; align-items:center;
+    flex-wrap:wrap;
+  }
+  button.primary{
+    background:var(--ink); color:var(--ground); border:none;
+    padding:14px 28px; font-size:14px; font-weight:600;
+    letter-spacing:-.005em; cursor:pointer; font-family:inherit;
+    border-radius:0;
+  }
+  button.primary:hover{ background:var(--accent); color:var(--accent-ink); }
+  button.ghost{
+    background:transparent; color:var(--ink); border:1px solid var(--hair-strong);
+    padding:13px 22px; font-size:14px; cursor:pointer; font-family:inherit;
+    border-radius:0;
+  }
+  button.ghost:hover{ border-color:var(--ink); }
+  .compute-meta{
+    margin-left:auto; font-size:12px; color:var(--mute);
+    font-family:ui-monospace,monospace; letter-spacing:.02em;
+  }
+
+  /* Result winner */
+  .winner{
+    background:var(--panel); border:1px solid var(--hair);
+    padding:36px; margin-top:24px; box-shadow:var(--shadow); position:relative;
+  }
+  .winner::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
+    background:var(--accent);
+  }
+  .winner-eyebrow{
+    font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--accent); font-weight:600; margin-bottom:12px;
+  }
+  .combo{
+    font-size:clamp(24px,3vw,32px); font-weight:600; letter-spacing:-.015em;
+    line-height:1.2; text-wrap:balance;
+  }
+  .combo .plus{ color:var(--mute); font-weight:400; margin:0 10px; }
+  .combo .single{ display:inline-block; }
+
+  .kpi{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    background:var(--hair); border:1px solid var(--hair);
+    margin-top:28px;
+  }
+  .kpi-cell{
+    background:var(--panel); padding:18px;
+  }
+  .kpi-cell .lbl{
+    font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--mute); font-weight:500; margin-bottom:8px;
+  }
+  .kpi-cell .val{
+    font-size:22px; font-weight:600; letter-spacing:-.015em;
+  }
+  .kpi-cell.pos .val{ color:var(--good); }
+  .kpi-cell.neg .val{ color:var(--warn); }
+  @media (max-width:720px){
+    .kpi{ grid-template-columns:repeat(2,1fr); }
+  }
+
+  /* Rankings */
+  .rank{
+    margin-top:32px; display:flex; flex-direction:column; gap:1px;
+    background:var(--hair); border:1px solid var(--hair);
+  }
+  .rank-row{
+    background:var(--panel); display:grid;
+    grid-template-columns:36px 1fr auto auto; gap:20px;
+    padding:16px 20px; align-items:center;
+  }
+  .rank-row .r{
+    font-size:12px; color:var(--mute); font-family:ui-monospace,monospace;
+    font-weight:600;
+  }
+  .rank-row .c{ font-size:14px; font-weight:500; }
+  .rank-row .rate{
+    font-size:12px; color:var(--mute); font-family:ui-monospace,monospace;
+    letter-spacing:.02em;
+  }
+  .rank-row .b{
+    font-size:15px; font-weight:600;
+    font-family:ui-monospace,monospace; font-variant-numeric:tabular-nums;
+  }
+  .rank-row.top{ background:var(--accent-wash); }
+  .rank-row.top .r{ color:var(--accent); }
+  @media (max-width:600px){
+    .rank-row{ grid-template-columns:32px 1fr auto; }
+    .rank-row .rate{ display:none; }
+  }
+
+  /* Quote */
+  .quote-wrap{ margin-top:32px; }
+  .quote{
+    background:var(--panel); border:1px solid var(--ink);
+    padding:40px; font-family:"Apple SD Gothic Neo",serif;
+    position:relative;
+  }
+  .quote-head{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding-bottom:20px; border-bottom:2px solid var(--ink); margin-bottom:24px;
+  }
+  .quote-title{
+    font-size:11px; letter-spacing:.24em; text-transform:uppercase;
+    color:var(--mute); font-weight:600; margin-bottom:6px;
+  }
+  .quote-h{ font-size:26px; font-weight:700; letter-spacing:-.02em; margin:0; }
+  .quote-meta{ text-align:right; font-size:12px; color:var(--mute); font-family:ui-monospace,monospace; line-height:1.7; }
+  .quote table{ width:100%; border-collapse:collapse; margin-bottom:24px; }
+  .quote th, .quote td{
+    text-align:left; padding:10px 8px;
+    border-bottom:1px solid var(--hair); font-size:13.5px;
+  }
+  .quote th{
+    font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--mute); font-weight:600; padding-bottom:8px;
+  }
+  .quote td.num{ text-align:right; }
+  .quote-total{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding-top:16px; border-top:2px solid var(--ink);
+  }
+  .quote-total .l{ font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); }
+  .quote-total .v{ font-size:28px; font-weight:700; font-family:ui-monospace,monospace; letter-spacing:-.02em; }
+  .quote-total .v.pos{ color:var(--good); }
+  .quote-fine{ margin-top:20px; font-size:11px; color:var(--mute); line-height:1.6; }
+
+  .hidden{ display:none; }
+  .fade-in{ animation:fade .5s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+  @media (prefers-reduced-motion:reduce){ .fade-in{ animation:none; } }
+
+  /* Footer */
+  footer.foot{
+    margin-top:96px; padding-top:24px; border-top:1px solid var(--hair);
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:12px; color:var(--mute); font-family:ui-monospace,monospace;
+    letter-spacing:.02em;
+  }
+</style>
+
+<div class="copyright-bar">
+  AI Design by alexpark <span class="sep">·</span> © Copyright <span class="sep">·</span> All rights reserved
+</div>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div class="brand-name">AI 카드 견적 <em>· prototype v0.1</em></div>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">Dark</button>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Digital financial consulting</div>
+    <h1>당신의 소비를 읽고, 카드 조합을 계산합니다.<span class="rule"></span></h1>
+    <p class="lede">약관을 이해할 필요 없이, 소비 패턴만 알려주세요. AI가 신한카드 라인업 <span class="num">10</span>장으로 만들 수 있는 <span class="num">45</span>가지 2장 조합을 검토해 연간 혜택이 가장 큰 조합을 찾아드립니다.</p>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2 class="sec-title">소비 정보</h2>
+    </div>
+    <div class="panel">
+      <div class="field">
+        <div class="field-label">
+          <span class="name">월 총 이용액</span>
+          <span class="value num" id="spendVal">₩ 1,200,000</span>
+        </div>
+        <input type="range" id="spend" min="300000" max="5000000" step="100000" value="1200000">
+      </div>
+
+      <div class="field">
+        <div class="field-label"><span class="name">업종별 비중 <span style="color:var(--mute); font-weight:400; margin-left:6px;">(14개 세부 업종)</span></span><span class="value num" id="mixTotal">100%</span></div>
+        <div class="cat-groups" id="cats">
+          <div class="cat-group">
+            <div class="cat-group-label">쇼핑</div>
+            <div class="cat-group-items">
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">온라인쇼핑</span><span class="value num" data-vlabel="online">22%</span></div><input type="range" min="0" max="50" step="1" value="22" data-cat="online"></div>
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">백화점·아울렛</span><span class="value num" data-vlabel="dept">5%</span></div><input type="range" min="0" max="50" step="1" value="5" data-cat="dept"></div>
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">대형마트</span><span class="value num" data-vlabel="mart">10%</span></div><input type="range" min="0" max="50" step="1" value="10" data-cat="mart"></div>
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">편의점</span><span class="value num" data-vlabel="cvs">5%</span></div><input type="range" min="0" max="50" step="1" value="5" data-cat="cvs"></div>
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="cat-group-label">교통</div>
+            <div class="cat-group-items">
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">주유</span><span class="value num" data-vlabel="fuel">12%</span></div><input type="range" min="0" max="50" step="1" value="12" data-cat="fuel"></div>
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">대중교통·택시</span><span class="value num" data-vlabel="transit">8%</span></div><input type="range" min="0" max="50" step="1" value="8" data-cat="transit"></div>
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="cat-group-label">식음료</div>
+            <div class="cat-group-items">
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">배달앱</span><span class="value num" data-vlabel="delivery">8%</span></div><input type="range" min="0" max="50" step="1" value="8" data-cat="delivery"></div>
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">카페·베이커리</span><span class="value num" data-vlabel="cafe">5%</span></div><input type="range" min="0" max="50" step="1" value="5" data-cat="cafe"></div>
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">외식</span><span class="value num" data-vlabel="dining">8%</span></div><input type="range" min="0" max="50" step="1" value="8" data-cat="dining"></div>
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="cat-group-label">생활</div>
+            <div class="cat-group-items">
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">병원·약국</span><span class="value num" data-vlabel="medical">4%</span></div><input type="range" min="0" max="50" step="1" value="4" data-cat="medical"></div>
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">통신·공과금</span><span class="value num" data-vlabel="utility">7%</span></div><input type="range" min="0" max="50" step="1" value="7" data-cat="utility"></div>
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="cat-group-label">여가</div>
+            <div class="cat-group-items">
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">여행·항공·호텔</span><span class="value num" data-vlabel="travel">3%</span></div><input type="range" min="0" max="50" step="1" value="3" data-cat="travel"></div>
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">해외이용</span><span class="value num" data-vlabel="overseas">1%</span></div><input type="range" min="0" max="50" step="1" value="1" data-cat="overseas"></div>
+            </div>
+          </div>
+          <div class="cat-group">
+            <div class="cat-group-label">기타</div>
+            <div class="cat-group-items">
+              <div class="field" style="margin:0"><div class="field-label"><span class="name">기타</span><span class="value num" data-vlabel="etc">2%</span></div><input type="range" min="0" max="50" step="1" value="2" data-cat="etc"></div>
+            </div>
+          </div>
+        </div>
+        <div class="cat-total" id="mixHint">합계가 100%가 될 때 계산이 가장 정확합니다.</div>
+      </div>
+
+      <div class="compute">
+        <button class="primary" id="run">AI 최적 조합 계산</button>
+        <button class="ghost" id="reset">기본값으로</button>
+        <span class="compute-meta" id="meta">대기 중</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2 class="sec-title">AI 파이프라인</h2>
+    </div>
+    <div class="pipe" id="pipe">
+      <div class="pipe-step" data-i="1"><div><div class="n">STEP 1</div><div class="t">소비정보 입력</div></div><div class="out">—</div></div>
+      <div class="pipe-step" data-i="2"><div><div class="n">STEP 2</div><div class="t">소비패턴 분석</div></div><div class="out">—</div></div>
+      <div class="pipe-step" data-i="3"><div><div class="n">STEP 3</div><div class="t">룰엔진 적용</div></div><div class="out">—</div></div>
+      <div class="pipe-step" data-i="4"><div><div class="n">STEP 4</div><div class="t">조합 계산</div></div><div class="out">—</div></div>
+      <div class="pipe-step" data-i="5"><div><div class="n">STEP 5</div><div class="t">최적 조합 선정</div></div><div class="out">—</div></div>
+      <div class="pipe-step" data-i="6"><div><div class="n">STEP 6</div><div class="t">견적서 생성</div></div><div class="out">—</div></div>
+    </div>
+  </section>
+
+  <section class="sec hidden" id="resultSec">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2 class="sec-title">최적 조합</h2>
+    </div>
+
+    <div class="winner">
+      <div class="winner-eyebrow">Recommended</div>
+      <div class="combo" id="winnerCombo">—</div>
+      <div class="kpi">
+        <div class="kpi-cell pos">
+          <div class="lbl">예상 연간혜택</div>
+          <div class="val num" id="kBenefit">—</div>
+        </div>
+        <div class="kpi-cell">
+          <div class="lbl">실질 할인율</div>
+          <div class="val num" id="kRate">—</div>
+        </div>
+        <div class="kpi-cell neg">
+          <div class="lbl">연회비 차감</div>
+          <div class="val num" id="kFee">—</div>
+        </div>
+        <div class="kpi-cell pos">
+          <div class="lbl">ROI (순이익)</div>
+          <div class="val num" id="kRoi">—</div>
+        </div>
+      </div>
+      <div class="compute" style="margin-top:28px">
+        <button class="primary" id="issue">견적서 자동 생성</button>
+        <span class="compute-meta" id="qmeta"></span>
+      </div>
+    </div>
+
+    <div style="margin-top:32px">
+      <div style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--mute); font-weight:600; margin-bottom:12px;">Top 8 candidates</div>
+      <div class="rank" id="rank"></div>
+    </div>
+
+    <div class="quote-wrap hidden" id="quoteWrap">
+      <div class="quote" id="quote"></div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>AI 카드 견적 · demo</span>
+    <span id="stamp">—</span>
+  </footer>
+</div>
+
+<script>
+(() => {
+  // Theme toggle
+  const root = document.documentElement;
+  const tbtn = document.getElementById('themeToggle');
+  const applyBtnLabel = () => {
+    const cur = root.getAttribute('data-theme') ||
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    tbtn.textContent = cur === 'dark' ? 'Light' : 'Dark';
+  };
+  applyBtnLabel();
+  tbtn.addEventListener('click', () => {
+    const cur = root.getAttribute('data-theme') ||
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+    applyBtnLabel();
+  });
+
+  // ---- Data ----
+  const CATS = [
+    { key:'online',   ko:'온라인쇼핑',    group:'쇼핑',   init:22 },
+    { key:'dept',     ko:'백화점·아울렛',  group:'쇼핑',   init:5  },
+    { key:'mart',     ko:'대형마트',       group:'쇼핑',   init:10 },
+    { key:'cvs',      ko:'편의점',         group:'쇼핑',   init:5  },
+    { key:'fuel',     ko:'주유',           group:'교통',   init:12 },
+    { key:'transit',  ko:'대중교통·택시',   group:'교통',   init:8  },
+    { key:'delivery', ko:'배달앱',         group:'식음료', init:8  },
+    { key:'cafe',     ko:'카페·베이커리',   group:'식음료', init:5  },
+    { key:'dining',   ko:'외식',           group:'식음료', init:8  },
+    { key:'medical',  ko:'병원·약국',      group:'생활',   init:4  },
+    { key:'utility',  ko:'통신·공과금',    group:'생활',   init:7  },
+    { key:'travel',   ko:'여행·항공·호텔',  group:'여가',   init:3  },
+    { key:'overseas', ko:'해외이용',       group:'여가',   init:1  },
+    { key:'etc',      ko:'기타',           group:'기타',   init:2  },
+  ];
+
+  // 신한카드 라인업 (demo). rates by category, monthly discount cap, annual fee.
+  const CARDS = [
+    { id:'sh_dd',      name:'신한 Deep Dream',       fee:20000, cap:50000,
+      rates:{ online:.05, dept:.02, mart:.02, cvs:.03, fuel:.02, transit:.02, delivery:.03, cafe:.03, dining:.02, medical:.01, utility:.03, travel:.02, overseas:.02, etc:.01 } },
+    { id:'sh_mr',      name:'신한 Mr.Life',          fee:18000, cap:45000,
+      rates:{ online:.02, dept:.02, mart:.05, cvs:.04, fuel:.03, transit:.02, delivery:.02, cafe:.02, dining:.02, medical:.04, utility:.03, travel:.01, overseas:.01, etc:.015 } },
+    { id:'sh_oil',     name:'신한 Deep Oil',         fee:15000, cap:40000,
+      rates:{ online:.015,dept:.01, mart:.02, cvs:.02, fuel:.08, transit:.03, delivery:.01, cafe:.01, dining:.01, medical:.01, utility:.01, travel:.01, overseas:.01, etc:.01 } },
+    { id:'sh_yay',     name:'신한 YAY',              fee:10000, cap:35000,
+      rates:{ online:.04, dept:.01, mart:.02, cvs:.03, fuel:.01, transit:.05, delivery:.08, cafe:.07, dining:.03, medical:.01, utility:.02, travel:.01, overseas:.01, etc:.02 } },
+    { id:'sh_classic', name:'신한 The CLASSIC-L',     fee:35000, cap:70000,
+      rates:{ online:.03, dept:.05, mart:.03, cvs:.02, fuel:.03, transit:.02, delivery:.03, cafe:.03, dining:.04, medical:.05, utility:.02, travel:.05, overseas:.04, etc:.025 } },
+    { id:'sh_hipoint', name:'신한 Hi-Point',         fee:12000, cap:38000,
+      rates:{ online:.035,dept:.03, mart:.03, cvs:.03, fuel:.025,transit:.03, delivery:.03, cafe:.03, dining:.03, medical:.025,utility:.03, travel:.03, overseas:.025,etc:.02 } },
+    { id:'sh_way',     name:'신한 Way',              fee:22000, cap:48000,
+      rates:{ online:.02, dept:.02, mart:.02, cvs:.02, fuel:.02, transit:.02, delivery:.02, cafe:.02, dining:.02, medical:.02, utility:.02, travel:.06, overseas:.05, etc:.045 } },
+    { id:'sh_bbig',    name:'신한 B.Big',            fee:25000, cap:60000,
+      rates:{ online:.02, dept:.05, mart:.05, cvs:.02, fuel:.04, transit:.02, delivery:.02, cafe:.02, dining:.04, medical:.02, utility:.02, travel:.02, overseas:.02, etc:.02 } },
+    { id:'sh_simple',  name:'신한 Simple e',         fee:8000,  cap:28000,
+      rates:{ online:.06, dept:.01, mart:.01, cvs:.02, fuel:.01, transit:.02, delivery:.04, cafe:.03, dining:.01, medical:.01, utility:.02, travel:.01, overseas:.01, etc:.005 } },
+    { id:'sh_first',   name:'신한 처음 (초심)',       fee:6000,  cap:25000,
+      rates:{ online:.03, dept:.01, mart:.02, cvs:.04, fuel:.02, transit:.03, delivery:.03, cafe:.03, dining:.02, medical:.05, utility:.03, travel:.01, overseas:.01, etc:.02 } },
+  ];
+
+  const fmt = n => '₩ ' + Math.round(n).toLocaleString('ko-KR');
+  const fmtSigned = n => (n >= 0 ? '+ ' : '− ') + fmt(Math.abs(n)).replace('₩ ','₩ ');
+
+  // ---- State ----
+  const state = {
+    spend: 1200000,
+    mix: Object.fromEntries(CATS.map(c => [c.key, c.init])),
+  };
+
+  // Category sliders are pre-rendered as static HTML for maximum compatibility.
+  // JS below only wires event handlers.
+
+  // ---- Wire inputs ----
+  const spendEl = document.getElementById('spend');
+  const spendVal = document.getElementById('spendVal');
+  spendEl.addEventListener('input', () => {
+    state.spend = +spendEl.value;
+    spendVal.textContent = fmt(state.spend);
+  });
+
+  document.querySelectorAll('input[data-cat]').forEach(el => {
+    el.addEventListener('input', () => {
+      const k = el.dataset.cat;
+      state.mix[k] = +el.value;
+      document.querySelector(`[data-vlabel="${k}"]`).textContent = el.value + '%';
+      renderMixTotal();
+    });
+  });
+
+  const mixTotal = document.getElementById('mixTotal');
+  const mixHint = document.getElementById('mixHint');
+  function renderMixTotal(){
+    const t = CATS.reduce((s,c) => s + state.mix[c.key], 0);
+    mixTotal.textContent = t + '%';
+    if (t === 100){
+      mixHint.textContent = '합계 100% — 준비 완료';
+      mixHint.classList.remove('warn');
+    } else {
+      mixHint.textContent = `합계 ${t}% — 나머지 ${100-t}%는 "기타"로 자동 배분됩니다.`;
+      mixHint.classList.add('warn');
+    }
+  }
+  renderMixTotal();
+
+  document.getElementById('reset').addEventListener('click', () => {
+    spendEl.value = 1200000; state.spend = 1200000; spendVal.textContent = fmt(1200000);
+    CATS.forEach(c => {
+      state.mix[c.key] = c.init;
+      const s = document.querySelector(`input[data-cat="${c.key}"]`);
+      s.value = c.init;
+      document.querySelector(`[data-vlabel="${c.key}"]`).textContent = c.init + '%';
+    });
+    renderMixTotal();
+  });
+
+  // ---- Compute ----
+  // For a card set S applied to a spend distribution, for each category pick the best rate across cards in S
+  // then multiply by that category's monthly spend, clamp by the max cap of any single card handling that category (approx).
+  // Simple, illustrative — good enough for a demo.
+  function normalizedMix(){
+    const t = CATS.reduce((s,c) => s + state.mix[c.key], 0);
+    if (t === 100) return {...state.mix};
+    // any missing % goes to etc
+    const m = {...state.mix};
+    m.etc = m.etc + (100 - t);
+    return m;
+  }
+
+  function evaluate(cardSet){
+    const monthly = state.spend;
+    const mix = normalizedMix();
+    let monthlyBenefit = 0;
+    const perCat = {};
+    for (const c of CATS){
+      const catSpend = monthly * mix[c.key] / 100;
+      // best rate & the card that offers it
+      let best = { rate: 0, card: null };
+      for (const card of cardSet){
+        const r = card.rates[c.key] || 0;
+        if (r > best.rate){ best = { rate: r, card }; }
+      }
+      let raw = catSpend * best.rate;
+      // cap: each card contributes at most its monthly cap across all categories it "wins".
+      // approximation: cap per-category by card.cap / (number of cats it wins).
+      perCat[c.key] = { spend: catSpend, rate: best.rate, raw, card: best.card };
+    }
+    // Apply per-card monthly cap approximation
+    const winsByCard = {};
+    Object.values(perCat).forEach(v => {
+      if (v.card){
+        winsByCard[v.card.id] = winsByCard[v.card.id] || { card: v.card, raw:0 };
+        winsByCard[v.card.id].raw += v.raw;
+      }
+    });
+    Object.values(winsByCard).forEach(w => {
+      if (w.raw > w.card.cap){
+        const scale = w.card.cap / w.raw;
+        Object.values(perCat).forEach(v => {
+          if (v.card && v.card.id === w.card.id){ v.raw *= scale; }
+        });
+      }
+    });
+    monthlyBenefit = Object.values(perCat).reduce((s,v) => s + v.raw, 0);
+    const annualBenefit = monthlyBenefit * 12;
+    const annualFee = cardSet.reduce((s,c) => s + c.fee, 0);
+    const roi = annualBenefit - annualFee;
+    const effRate = annualBenefit / (monthly * 12);
+    return { cards: cardSet, annualBenefit, annualFee, roi, effRate, perCat };
+  }
+
+  function findBest(){
+    const results = [];
+    // 신한카드 2장 조합만 (singles 제외)
+    for (let i=0;i<CARDS.length;i++){
+      for (let j=i+1;j<CARDS.length;j++){
+        results.push(evaluate([CARDS[i], CARDS[j]]));
+      }
+    }
+    results.sort((a,b) => b.roi - a.roi);
+    return results;
+  }
+
+  // Pipeline visualization
+  const pipe = document.getElementById('pipe');
+  const steps = pipe.querySelectorAll('.pipe-step');
+  function setStep(i, text){
+    const s = steps[i-1];
+    s.classList.add('on');
+    s.querySelector('.out').textContent = text;
+  }
+  function resetSteps(){
+    steps.forEach(s => { s.classList.remove('on'); s.querySelector('.out').textContent = '—'; });
+  }
+  function delay(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+  const resultSec = document.getElementById('resultSec');
+  const runBtn = document.getElementById('run');
+  const meta = document.getElementById('meta');
+
+  runBtn.addEventListener('click', async () => {
+    runBtn.disabled = true;
+    resultSec.classList.add('hidden');
+    document.getElementById('quoteWrap').classList.add('hidden');
+    resetSteps();
+    const t0 = performance.now();
+
+    meta.textContent = '실행 중…';
+    setStep(1, fmt(state.spend) + ' / mo');
+    await delay(180);
+
+    const mix = normalizedMix();
+    const top3 = Object.entries(mix).sort((a,b) => b[1]-a[1]).slice(0,3)
+      .map(([k,v]) => CATS.find(c=>c.key===k).ko.split('·')[0] + ' ' + v + '%').join(' · ');
+    setStep(2, 'Top3: ' + top3);
+    await delay(220);
+
+    setStep(3, '신한 ' + CARDS.length + '장 · 룰 적용');
+    await delay(220);
+
+    const results = findBest();
+    const combos = CARDS.length*(CARDS.length-1)/2;
+    setStep(4, combos.toLocaleString('ko-KR') + '개 2장 조합');
+    await delay(260);
+
+    const best = results[0];
+    setStep(5, best.cards.map(c=>c.name.split(' ').pop()).join(' + '));
+    await delay(200);
+
+    setStep(6, 'ready');
+    const elapsed = (performance.now() - t0);
+    meta.textContent = '완료 · ' + elapsed.toFixed(0) + 'ms';
+
+    renderResult(results);
+    runBtn.disabled = false;
+  });
+
+  function renderResult(results){
+    const best = results[0];
+    resultSec.classList.remove('hidden');
+    resultSec.classList.add('fade-in');
+    document.getElementById('winnerCombo').innerHTML =
+      best.cards.map(c => `<span class="single">${c.name}</span>`).join('<span class="plus">+</span>');
+    document.getElementById('kBenefit').textContent = fmt(best.annualBenefit);
+    document.getElementById('kRate').textContent = (best.effRate * 100).toFixed(2) + '%';
+    document.getElementById('kFee').textContent = '− ' + fmt(best.annualFee);
+    document.getElementById('kRoi').textContent = fmt(best.roi);
+
+    const rank = document.getElementById('rank');
+    rank.innerHTML = '';
+    results.slice(0,8).forEach((r,i) => {
+      const row = document.createElement('div');
+      row.className = 'rank-row' + (i===0 ? ' top' : '');
+      row.innerHTML = `
+        <div class="r">${String(i+1).padStart(2,'0')}</div>
+        <div class="c">${r.cards.map(c => c.name).join('  +  ')}</div>
+        <div class="rate num">${(r.effRate*100).toFixed(2)}%</div>
+        <div class="b">${fmt(r.roi)}</div>
+      `;
+      rank.appendChild(row);
+    });
+
+    // stash best for quote
+    window.__best = best;
+  }
+
+  // Quote generator
+  document.getElementById('issue').addEventListener('click', () => {
+    const best = window.__best;
+    if (!best) return;
+    const now = new Date();
+    const stamp = now.getFullYear() + '.' +
+      String(now.getMonth()+1).padStart(2,'0') + '.' +
+      String(now.getDate()).padStart(2,'0');
+    const qid = 'Q-' + now.getFullYear() +
+      String(now.getMonth()+1).padStart(2,'0') +
+      String(now.getDate()).padStart(2,'0') + '-' +
+      String(Math.floor(Math.random()*9000)+1000);
+
+    const rows = CATS.map(c => {
+      const v = best.perCat[c.key];
+      return `<tr>
+        <td>${c.ko}</td>
+        <td>${v.card ? v.card.name : '—'}</td>
+        <td class="num num">${(v.rate*100).toFixed(1)}%</td>
+        <td class="num num">${fmt(v.spend)}</td>
+        <td class="num num">${fmt(v.raw*12)}</td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('quote').innerHTML = `
+      <div class="quote-head">
+        <div>
+          <div class="quote-title">Quotation</div>
+          <h3 class="quote-h">${best.cards.map(c=>c.name).join('  +  ')}</h3>
+        </div>
+        <div class="quote-meta">
+          ${qid}<br>
+          발행일 · ${stamp}<br>
+          유효기간 · 30일
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>업종</th><th>담당 카드</th><th>할인율</th><th>월 이용액</th><th>연간 혜택</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+
+      <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--mute); margin-bottom:8px;">
+        <span>연간 총 혜택</span>
+        <span class="num">${fmt(best.annualBenefit)}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--mute); margin-bottom:16px;">
+        <span>연회비 (${best.cards.length}장 합계)</span>
+        <span class="num">− ${fmt(best.annualFee)}</span>
+      </div>
+
+      <div class="quote-total">
+        <span class="l">Net Annual ROI</span>
+        <span class="v pos num">${fmt(best.roi)}</span>
+      </div>
+
+      <p class="quote-fine">본 견적은 입력하신 소비 패턴과 카드사 약관을 기반으로 산출된 예측치이며, 실제 혜택은 카드사 정책 · 전월 실적 · 프로모션에 따라 달라질 수 있습니다. AI 카드 견적 프로토타입에서 자동 생성되었습니다.</p>
+    `;
+    document.getElementById('quoteWrap').classList.remove('hidden');
+    document.getElementById('quoteWrap').classList.add('fade-in');
+    document.getElementById('qmeta').textContent = qid + ' · 생성 완료';
+    document.getElementById('quoteWrap').scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+
+  // Stamp
+  const d = new Date();
+  document.getElementById('stamp').textContent =
+    d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
+})();
+</script>
+</body>
+</html>
