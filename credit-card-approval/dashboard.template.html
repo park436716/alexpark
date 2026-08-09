@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>신용카드 간이심사 모델 · 대시보드</title>
 <meta name="description" content="신용카드 간이심사 모델 · CB 조회 없이 승인 확률 예측 데모">
 <meta property="og:type" content="website">
@@ -9,6 +14,7 @@
 <meta name="twitter:title" content="신용카드 간이심사 모델">
 <meta name="twitter:description" content="CB 조회 없이 승인 확률 예측 데모 · 실시간 시나리오 시뮬레이터, 성능 차트, 임계값 정책 시뮬레이션">
 <style>
+  html, body { margin: 0; padding: 0; }
   :root {
     --bg: #f7f8fa;
     --surface: #ffffff;
@@ -527,7 +533,8 @@
     .meter-fill, input[type="range"]::-webkit-slider-thumb { transition: none !important; }
   }
 </style>
-
+</head>
+<body>
 <div class="wrap">
   <div class="header-row">
     <div>
@@ -1209,3 +1216,5 @@ function init() {
 
 init();
 </script>
+</body>
+</html>
