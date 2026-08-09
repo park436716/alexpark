@@ -12,6 +12,7 @@ from pathlib import Path
 
 from src.data import GenConfig, generate, time_based_split
 from src.model import train_and_save
+from src.report_export import build_report
 
 
 def main() -> None:
@@ -21,6 +22,10 @@ def main() -> None:
     parser.add_argument(
         "--artifact", type=Path,
         default=Path(__file__).parent / "artifacts" / "model.joblib",
+    )
+    parser.add_argument(
+        "--report", type=Path, default=None,
+        help="If set, also write a JSON dashboard report to this path.",
     )
     args = parser.parse_args()
 
@@ -45,6 +50,14 @@ def main() -> None:
     print("=== Test ===")
     for k, v in meta.test_report.items():
         print(f"  {k:20s} = {v:.4f}" if isinstance(v, (int, float)) else f"  {k:20s} = {v}")
+
+    if args.report is not None:
+        print()
+        print(f"[+] Writing dashboard report to {args.report} ...")
+        import joblib
+        artifact = joblib.load(args.artifact)
+        build_report(train_df, valid_df, test_df, artifact, args.report)
+        print("    done.")
 
 
 if __name__ == "__main__":
