@@ -1,0 +1,3319 @@
+[
+  {
+    "id": "ctx-001",
+    "category": "fraud_cnp",
+    "network": "visa",
+    "question": "Cardholder claims an online purchase of $45.00 at Acme Electronics was not made by them. What are our options on Visa?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "10.4",
+      "reason_title": "Other Fraud - Card Absent Environment",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": true,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-002",
+    "category": "fraud_cnp",
+    "network": "mastercard",
+    "question": "Cardholder claims an online purchase of $120.00 at SkyBooks was not made by them. What are our options on Mastercard?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4837",
+      "reason_title": "No Cardholder Authorization",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": true,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-003",
+    "category": "fraud_cnp",
+    "network": "amex",
+    "question": "Cardholder claims an online purchase of $299.99 at GreenGrocer Online was not made by them. What are our options on American Express?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "F29",
+      "reason_title": "Card Not Present",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-004",
+    "category": "fraud_cp",
+    "network": "visa",
+    "question": "In-store purchase of $299.99 at SkyBooks — cardholder says card was in their wallet. How does Visa handle this?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "10.3",
+      "reason_title": "Other Fraud - Card Present",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": true,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-005",
+    "category": "fraud_cp",
+    "network": "mastercard",
+    "question": "In-store purchase of $1,250.00 at GreenGrocer Online — cardholder says card was in their wallet. How does Mastercard handle this?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4837",
+      "reason_title": "No Cardholder Authorization",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": true,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-006",
+    "category": "fraud_cp",
+    "network": "amex",
+    "question": "In-store purchase of $78.50 at TravelWorld — cardholder says card was in their wallet. How does American Express handle this?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "F24",
+      "reason_title": "No Cardmember Authorization",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-007",
+    "category": "emv_counterfeit",
+    "network": "visa",
+    "question": "Counterfeit card used at a magstripe-only terminal for $78.50. Which Visa code applies and who bears loss?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "10.1",
+      "reason_title": "EMV Liability Shift Counterfeit Fraud",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": true,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-008",
+    "category": "emv_counterfeit",
+    "network": "mastercard",
+    "question": "Counterfeit card used at a magstripe-only terminal for $540.00. Which Mastercard code applies and who bears loss?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4870",
+      "reason_title": "Chip Liability Shift",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-009",
+    "category": "emv_counterfeit",
+    "network": "amex",
+    "question": "Counterfeit card used at a magstripe-only terminal for $45.00. Which American Express code applies and who bears loss?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "F30",
+      "reason_title": "EMV Counterfeit",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-010",
+    "category": "no_auth",
+    "network": "visa",
+    "question": "Merchant force-posted $45.00 without authorization approval. How does Visa classify this?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "11.3",
+      "reason_title": "No Authorization",
+      "category": "authorization",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Authorization approval code and timestamp",
+        "Authorization amount vs settled amount reconciliation",
+        "Force-post reason, if any",
+        "MID/TID and settlement batch reference"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-011",
+    "category": "no_auth",
+    "network": "mastercard",
+    "question": "Merchant force-posted $120.00 without authorization approval. How does Mastercard classify this?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4808",
+      "reason_title": "Authorization-Related Chargeback",
+      "category": "authorization",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Authorization approval code and timestamp",
+        "Authorization amount vs settled amount reconciliation",
+        "Force-post reason, if any",
+        "MID/TID and settlement batch reference"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-012",
+    "category": "no_auth",
+    "network": "amex",
+    "question": "Merchant force-posted $299.99 without authorization approval. How does American Express classify this?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "A02",
+      "reason_title": "No Valid Authorization",
+      "category": "authorization",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Authorization approval code and timestamp",
+        "Authorization amount vs settled amount reconciliation",
+        "Force-post reason, if any",
+        "MID/TID and settlement batch reference"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-013",
+    "category": "declined_auth",
+    "network": "visa",
+    "question": "Auth was declined but merchant settled $299.99 anyway. Reason code under Visa?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "11.2",
+      "reason_title": "Declined Authorization",
+      "category": "authorization",
+      "time_limit_days": 75,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Authorization approval code and timestamp",
+        "Authorization amount vs settled amount reconciliation",
+        "Force-post reason, if any",
+        "MID/TID and settlement batch reference"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-014",
+    "category": "declined_auth",
+    "network": "mastercard",
+    "question": "Auth was declined but merchant settled $1,250.00 anyway. Reason code under Mastercard?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4808",
+      "reason_title": "Authorization-Related Chargeback",
+      "category": "authorization",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Authorization approval code and timestamp",
+        "Authorization amount vs settled amount reconciliation",
+        "Force-post reason, if any",
+        "MID/TID and settlement batch reference"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-015",
+    "category": "declined_auth",
+    "network": "amex",
+    "question": "Auth was declined but merchant settled $78.50 anyway. Reason code under American Express?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "A02",
+      "reason_title": "No Valid Authorization",
+      "category": "authorization",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Authorization approval code and timestamp",
+        "Authorization amount vs settled amount reconciliation",
+        "Force-post reason, if any",
+        "MID/TID and settlement batch reference"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-016",
+    "category": "expired_auth",
+    "network": "visa",
+    "question": "Auth was obtained 45 days before capture for $78.50. What is the Visa position?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "11.3",
+      "reason_title": "No Authorization",
+      "category": "authorization",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Authorization approval code and timestamp",
+        "Authorization amount vs settled amount reconciliation",
+        "Force-post reason, if any",
+        "MID/TID and settlement batch reference"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-017",
+    "category": "expired_auth",
+    "network": "mastercard",
+    "question": "Auth was obtained 45 days before capture for $540.00. What is the Mastercard position?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4808",
+      "reason_title": "Authorization-Related Chargeback",
+      "category": "authorization",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Authorization approval code and timestamp",
+        "Authorization amount vs settled amount reconciliation",
+        "Force-post reason, if any",
+        "MID/TID and settlement batch reference"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-018",
+    "category": "expired_auth",
+    "network": "amex",
+    "question": "Auth was obtained 45 days before capture for $45.00. What is the American Express position?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "A08",
+      "reason_title": "Authorization Approval Expired",
+      "category": "authorization",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Authorization approval code and timestamp",
+        "Authorization amount vs settled amount reconciliation",
+        "Force-post reason, if any",
+        "MID/TID and settlement batch reference"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-019",
+    "category": "amount_exceeds_auth",
+    "network": "visa",
+    "question": "Auth was for $50 but merchant captured $45.00. Visa handling?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "12.5",
+      "reason_title": "Incorrect Amount",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-020",
+    "category": "amount_exceeds_auth",
+    "network": "mastercard",
+    "question": "Auth was for $50 but merchant captured $120.00. Mastercard handling?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4834",
+      "reason_title": "Point-of-Interaction Error",
+      "category": "processing_error",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-021",
+    "category": "amount_exceeds_auth",
+    "network": "amex",
+    "question": "Auth was for $50 but merchant captured $299.99. American Express handling?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "A01",
+      "reason_title": "Charge Amount Exceeds Authorization",
+      "category": "authorization",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Authorization approval code and timestamp",
+        "Authorization amount vs settled amount reconciliation",
+        "Force-post reason, if any",
+        "MID/TID and settlement batch reference"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-022",
+    "category": "late_presentment",
+    "network": "visa",
+    "question": "Transaction settled 45 days after auth for $299.99. Chargeback risk on Visa?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "12.1",
+      "reason_title": "Late Presentment",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-023",
+    "category": "late_presentment",
+    "network": "mastercard",
+    "question": "Transaction settled 45 days after auth for $1,250.00. Chargeback risk on Mastercard?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4842",
+      "reason_title": "Late Presentment",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-024",
+    "category": "late_presentment",
+    "network": "amex",
+    "question": "Transaction settled 45 days after auth for $78.50. Chargeback risk on American Express?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "P07",
+      "reason_title": "Late Submission",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-025",
+    "category": "duplicate",
+    "network": "visa",
+    "question": "Cardholder was charged twice for the same $78.50 order at GreenGrocer Online. Which Visa code covers this?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "12.6.1",
+      "reason_title": "Duplicate Processing",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-026",
+    "category": "duplicate",
+    "network": "mastercard",
+    "question": "Cardholder was charged twice for the same $540.00 order at TravelWorld. Which Mastercard code covers this?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4834",
+      "reason_title": "Point-of-Interaction Error",
+      "category": "processing_error",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-027",
+    "category": "duplicate",
+    "network": "amex",
+    "question": "Cardholder was charged twice for the same $45.00 order at StreamPlus. Which American Express code covers this?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "P08",
+      "reason_title": "Duplicate Charge",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-028",
+    "category": "paid_other_means",
+    "network": "visa",
+    "question": "Cardholder paid cash on delivery but card was also charged $45.00. Visa reason code?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "12.6.2",
+      "reason_title": "Paid by Other Means",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-029",
+    "category": "paid_other_means",
+    "network": "mastercard",
+    "question": "Cardholder paid cash on delivery but card was also charged $120.00. Mastercard reason code?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4834",
+      "reason_title": "Point-of-Interaction Error",
+      "category": "processing_error",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-030",
+    "category": "paid_other_means",
+    "network": "amex",
+    "question": "Cardholder paid cash on delivery but card was also charged $299.99. American Express reason code?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "C14",
+      "reason_title": "Paid by Other Means",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-031",
+    "category": "incorrect_amount",
+    "network": "visa",
+    "question": "Merchant billed $299.99 but signed slip shows a different total. Visa handling?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "12.5",
+      "reason_title": "Incorrect Amount",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-032",
+    "category": "incorrect_amount",
+    "network": "mastercard",
+    "question": "Merchant billed $1,250.00 but signed slip shows a different total. Mastercard handling?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4834",
+      "reason_title": "Point-of-Interaction Error",
+      "category": "processing_error",
+      "time_limit_days": 90,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-033",
+    "category": "incorrect_amount",
+    "network": "amex",
+    "question": "Merchant billed $78.50 but signed slip shows a different total. American Express handling?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "P05",
+      "reason_title": "Incorrect Charge Amount",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-034",
+    "category": "not_received",
+    "network": "visa",
+    "question": "Cardholder never received an ordered item worth $78.50 from FitPro Gym. Visa reason code and window?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "13.1",
+      "reason_title": "Merchandise/Services Not Received",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-035",
+    "category": "not_received",
+    "network": "mastercard",
+    "question": "Cardholder never received an ordered item worth $540.00 from Acme Electronics. Mastercard reason code and window?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4855",
+      "reason_title": "Goods or Services Not Provided",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-036",
+    "category": "not_received",
+    "network": "amex",
+    "question": "Cardholder never received an ordered item worth $45.00 from SkyBooks. American Express reason code and window?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "C08",
+      "reason_title": "Goods/Services Not Received",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-037",
+    "category": "services_not_rendered",
+    "network": "visa",
+    "question": "Cardholder paid $45.00 for a service that was never performed. Visa approach?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "13.1",
+      "reason_title": "Merchandise/Services Not Received",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-038",
+    "category": "services_not_rendered",
+    "network": "mastercard",
+    "question": "Cardholder paid $120.00 for a service that was never performed. Mastercard approach?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4859",
+      "reason_title": "Services Not Rendered",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-039",
+    "category": "services_not_rendered",
+    "network": "amex",
+    "question": "Cardholder paid $299.99 for a service that was never performed. American Express approach?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "C08",
+      "reason_title": "Goods/Services Not Received",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-040",
+    "category": "cancelled_recurring",
+    "network": "visa",
+    "question": "Cardholder cancelled a subscription but merchant continued to bill $299.99. Visa code?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "13.2",
+      "reason_title": "Cancelled Recurring Transaction",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-041",
+    "category": "cancelled_recurring",
+    "network": "mastercard",
+    "question": "Cardholder cancelled a subscription but merchant continued to bill $1,250.00. Mastercard code?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4853",
+      "reason_title": "Cardholder Dispute (goods/services)",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-042",
+    "category": "cancelled_recurring",
+    "network": "amex",
+    "question": "Cardholder cancelled a subscription but merchant continued to bill $78.50. American Express code?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "C28",
+      "reason_title": "Cancelled Recurring Billing",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-043",
+    "category": "not_as_described",
+    "network": "visa",
+    "question": "Item received from GreenGrocer Online is materially different from listing (paid $78.50). Visa code?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "13.3",
+      "reason_title": "Not as Described or Defective Merchandise/Services",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-044",
+    "category": "not_as_described",
+    "network": "mastercard",
+    "question": "Item received from TravelWorld is materially different from listing (paid $540.00). Mastercard code?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4853",
+      "reason_title": "Cardholder Dispute (goods/services)",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-045",
+    "category": "not_as_described",
+    "network": "amex",
+    "question": "Item received from StreamPlus is materially different from listing (paid $45.00). American Express code?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "C31",
+      "reason_title": "Goods/Services Not as Described",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-046",
+    "category": "defective",
+    "network": "visa",
+    "question": "Product for $45.00 arrived defective and merchant refuses return. Visa handling?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "13.3",
+      "reason_title": "Not as Described or Defective Merchandise/Services",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-047",
+    "category": "defective",
+    "network": "mastercard",
+    "question": "Product for $120.00 arrived defective and merchant refuses return. Mastercard handling?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4853",
+      "reason_title": "Cardholder Dispute (goods/services)",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-048",
+    "category": "defective",
+    "network": "amex",
+    "question": "Product for $299.99 arrived defective and merchant refuses return. American Express handling?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "C32",
+      "reason_title": "Goods/Services Damaged or Defective",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-049",
+    "category": "credit_not_processed",
+    "network": "visa",
+    "question": "Merchant issued a return credit for $299.99 but it never posted after 30 days. Visa code?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "13.6",
+      "reason_title": "Credit Not Processed",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-050",
+    "category": "credit_not_processed",
+    "network": "mastercard",
+    "question": "Merchant issued a return credit for $1,250.00 but it never posted after 30 days. Mastercard code?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4860",
+      "reason_title": "Credit Not Processed",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-051",
+    "category": "credit_not_processed",
+    "network": "amex",
+    "question": "Merchant issued a return credit for $78.50 but it never posted after 30 days. American Express code?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "C02",
+      "reason_title": "Credit Not Processed",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-052",
+    "category": "cancelled_goods",
+    "network": "visa",
+    "question": "Cardholder cancelled order for $78.50 before shipment but was charged. Visa code?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "13.7",
+      "reason_title": "Cancelled Merchandise/Services",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-053",
+    "category": "cancelled_goods",
+    "network": "mastercard",
+    "question": "Cardholder cancelled order for $540.00 before shipment but was charged. Mastercard code?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4853",
+      "reason_title": "Cardholder Dispute (goods/services)",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-054",
+    "category": "cancelled_goods",
+    "network": "amex",
+    "question": "Cardholder cancelled order for $45.00 before shipment but was charged. American Express code?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "C05",
+      "reason_title": "Goods/Services Canceled",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-055",
+    "category": "goods_returned",
+    "network": "visa",
+    "question": "Cardholder returned goods worth $45.00; merchant received but did not refund. Visa approach?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "13.6",
+      "reason_title": "Credit Not Processed",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-056",
+    "category": "goods_returned",
+    "network": "mastercard",
+    "question": "Cardholder returned goods worth $120.00; merchant received but did not refund. Mastercard approach?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4860",
+      "reason_title": "Credit Not Processed",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-057",
+    "category": "goods_returned",
+    "network": "amex",
+    "question": "Cardholder returned goods worth $299.99; merchant received but did not refund. American Express approach?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "C04",
+      "reason_title": "Goods/Services Returned or Refused",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-058",
+    "category": "misrepresentation",
+    "network": "visa",
+    "question": "Merchant advertised a warranty that does not exist; charge $299.99. Visa code?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "13.5",
+      "reason_title": "Misrepresentation",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-059",
+    "category": "misrepresentation",
+    "network": "mastercard",
+    "question": "Merchant advertised a warranty that does not exist; charge $1,250.00. Mastercard code?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4853",
+      "reason_title": "Cardholder Dispute (goods/services)",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-060",
+    "category": "misrepresentation",
+    "network": "amex",
+    "question": "Merchant advertised a warranty that does not exist; charge $78.50. American Express code?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "C31",
+      "reason_title": "Goods/Services Not as Described",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-061",
+    "category": "does_not_recognize",
+    "network": "visa",
+    "question": "Cardholder does not recognize a $78.50 charge but has not confirmed fraud. Visa first step?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "10.4",
+      "reason_title": "Other Fraud - Card Absent Environment",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": true,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-062",
+    "category": "does_not_recognize",
+    "network": "mastercard",
+    "question": "Cardholder does not recognize a $540.00 charge but has not confirmed fraud. Mastercard first step?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4863",
+      "reason_title": "Cardholder Does Not Recognize",
+      "category": "fraud",
+      "time_limit_days": 60,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-063",
+    "category": "does_not_recognize",
+    "network": "amex",
+    "question": "Cardholder does not recognize a $45.00 charge but has not confirmed fraud. American Express first step?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "F24",
+      "reason_title": "No Cardmember Authorization",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-064",
+    "category": "questionable_merchant",
+    "network": "visa",
+    "question": "Multiple cardholders report the same unauthorized $45.00 pattern from one merchant. Visa response?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "10.4",
+      "reason_title": "Other Fraud - Card Absent Environment",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": true,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-065",
+    "category": "questionable_merchant",
+    "network": "mastercard",
+    "question": "Multiple cardholders report the same unauthorized $120.00 pattern from one merchant. Mastercard response?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4849",
+      "reason_title": "Questionable Merchant Activity",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-066",
+    "category": "questionable_merchant",
+    "network": "amex",
+    "question": "Multiple cardholders report the same unauthorized $299.99 pattern from one merchant. American Express response?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "F24",
+      "reason_title": "No Cardmember Authorization",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-067",
+    "category": "currency_error",
+    "network": "visa",
+    "question": "Merchant settled in wrong currency causing a $299.99 discrepancy. Visa code?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "12.5",
+      "reason_title": "Incorrect Amount",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-068",
+    "category": "currency_error",
+    "network": "mastercard",
+    "question": "Merchant settled in wrong currency causing a $1,250.00 discrepancy. Mastercard code?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4846",
+      "reason_title": "Correct Transaction Currency Code Not Provided",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-069",
+    "category": "currency_error",
+    "network": "amex",
+    "question": "Merchant settled in wrong currency causing a $78.50 discrepancy. American Express code?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "P05",
+      "reason_title": "Incorrect Charge Amount",
+      "category": "processing_error",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Original transaction receipt / TID",
+        "Settlement batch report showing single posting",
+        "Refund confirmation or credit transaction ARN",
+        "Currency conversion table used at capture"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-070",
+    "category": "chip_pin_shift",
+    "network": "visa",
+    "question": "PIN-preferring chip card used without PIN for $78.50. Visa liability?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "10.1",
+      "reason_title": "EMV Liability Shift Counterfeit Fraud",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": true,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-071",
+    "category": "chip_pin_shift",
+    "network": "mastercard",
+    "question": "PIN-preferring chip card used without PIN for $540.00. Mastercard liability?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4871",
+      "reason_title": "Chip/PIN Liability Shift",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-072",
+    "category": "chip_pin_shift",
+    "network": "amex",
+    "question": "PIN-preferring chip card used without PIN for $45.00. American Express liability?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "F30",
+      "reason_title": "EMV Counterfeit",
+      "category": "fraud",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "AVS/CVV match logs",
+        "3-D Secure (3DS) authentication result (ECI/CAVV)",
+        "IP address, device fingerprint, geolocation",
+        "Shipping address vs billing address match",
+        "Delivery signature or tracking with signature",
+        "Prior transaction history with same cardholder"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-073",
+    "category": "no_show_hotel",
+    "network": "visa",
+    "question": "Hotel no-show billed $45.00 but cardholder claims they cancelled. Visa handling?",
+    "answer": {
+      "network": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "reason_code": "13.7",
+      "reason_title": "Cancelled Merchandise/Services",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://visa/vcr-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-074",
+    "category": "no_show_hotel",
+    "network": "mastercard",
+    "question": "Hotel no-show billed $120.00 but cardholder claims they cancelled. Mastercard handling?",
+    "answer": {
+      "network": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "reason_code": "4853",
+      "reason_title": "Cardholder Dispute (goods/services)",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://mastercard/mccg-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-075",
+    "category": "no_show_hotel",
+    "network": "amex",
+    "question": "Hotel no-show billed $299.99 but cardholder claims they cancelled. American Express handling?",
+    "answer": {
+      "network": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "reason_code": "C05",
+      "reason_title": "Goods/Services Canceled",
+      "category": "consumer_dispute",
+      "time_limit_days": 120,
+      "requires_pre_arbitration": false,
+      "evidence_checklist": [
+        "Proof of delivery (tracking + signature)",
+        "Signed contract or terms of service acceptance",
+        "Merchant refund / cancellation policy shown at checkout",
+        "Communication log with cardholder (email/chat)",
+        "Photos or specs of the item as sold",
+        "Recurring billing consent (opt-in record)"
+      ],
+      "source_ref": "internal://amex/dispute-policy-2024.pdf"
+    }
+  },
+  {
+    "id": "ctx-076",
+    "category": "fraud_cnp",
+    "network": "comparison",
+    "question": "For a 'fraud cnp' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "10.4",
+          "reason_title": "Other Fraud - Card Absent Environment",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": true,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4837",
+          "reason_title": "No Cardholder Authorization",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": true,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "F29",
+          "reason_title": "Card Not Present",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-077",
+    "category": "fraud_cp",
+    "network": "comparison",
+    "question": "For a 'fraud cp' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "10.3",
+          "reason_title": "Other Fraud - Card Present",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": true,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4837",
+          "reason_title": "No Cardholder Authorization",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": true,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "F24",
+          "reason_title": "No Cardmember Authorization",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-078",
+    "category": "emv_counterfeit",
+    "network": "comparison",
+    "question": "For a 'emv counterfeit' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "10.1",
+          "reason_title": "EMV Liability Shift Counterfeit Fraud",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": true,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4870",
+          "reason_title": "Chip Liability Shift",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "F30",
+          "reason_title": "EMV Counterfeit",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-079",
+    "category": "no_auth",
+    "network": "comparison",
+    "question": "For a 'no auth' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "11.3",
+          "reason_title": "No Authorization",
+          "category": "authorization",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Authorization approval code and timestamp",
+            "Authorization amount vs settled amount reconciliation",
+            "Force-post reason, if any",
+            "MID/TID and settlement batch reference"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4808",
+          "reason_title": "Authorization-Related Chargeback",
+          "category": "authorization",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Authorization approval code and timestamp",
+            "Authorization amount vs settled amount reconciliation",
+            "Force-post reason, if any",
+            "MID/TID and settlement batch reference"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "A02",
+          "reason_title": "No Valid Authorization",
+          "category": "authorization",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Authorization approval code and timestamp",
+            "Authorization amount vs settled amount reconciliation",
+            "Force-post reason, if any",
+            "MID/TID and settlement batch reference"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-080",
+    "category": "declined_auth",
+    "network": "comparison",
+    "question": "For a 'declined auth' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "11.2",
+          "reason_title": "Declined Authorization",
+          "category": "authorization",
+          "time_limit_days": 75,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Authorization approval code and timestamp",
+            "Authorization amount vs settled amount reconciliation",
+            "Force-post reason, if any",
+            "MID/TID and settlement batch reference"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4808",
+          "reason_title": "Authorization-Related Chargeback",
+          "category": "authorization",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Authorization approval code and timestamp",
+            "Authorization amount vs settled amount reconciliation",
+            "Force-post reason, if any",
+            "MID/TID and settlement batch reference"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "A02",
+          "reason_title": "No Valid Authorization",
+          "category": "authorization",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Authorization approval code and timestamp",
+            "Authorization amount vs settled amount reconciliation",
+            "Force-post reason, if any",
+            "MID/TID and settlement batch reference"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-081",
+    "category": "expired_auth",
+    "network": "comparison",
+    "question": "For a 'expired auth' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "11.3",
+          "reason_title": "No Authorization",
+          "category": "authorization",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Authorization approval code and timestamp",
+            "Authorization amount vs settled amount reconciliation",
+            "Force-post reason, if any",
+            "MID/TID and settlement batch reference"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4808",
+          "reason_title": "Authorization-Related Chargeback",
+          "category": "authorization",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Authorization approval code and timestamp",
+            "Authorization amount vs settled amount reconciliation",
+            "Force-post reason, if any",
+            "MID/TID and settlement batch reference"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "A08",
+          "reason_title": "Authorization Approval Expired",
+          "category": "authorization",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Authorization approval code and timestamp",
+            "Authorization amount vs settled amount reconciliation",
+            "Force-post reason, if any",
+            "MID/TID and settlement batch reference"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-082",
+    "category": "amount_exceeds_auth",
+    "network": "comparison",
+    "question": "For a 'amount exceeds auth' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "12.5",
+          "reason_title": "Incorrect Amount",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4834",
+          "reason_title": "Point-of-Interaction Error",
+          "category": "processing_error",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "A01",
+          "reason_title": "Charge Amount Exceeds Authorization",
+          "category": "authorization",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Authorization approval code and timestamp",
+            "Authorization amount vs settled amount reconciliation",
+            "Force-post reason, if any",
+            "MID/TID and settlement batch reference"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-083",
+    "category": "late_presentment",
+    "network": "comparison",
+    "question": "For a 'late presentment' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "12.1",
+          "reason_title": "Late Presentment",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4842",
+          "reason_title": "Late Presentment",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "P07",
+          "reason_title": "Late Submission",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-084",
+    "category": "duplicate",
+    "network": "comparison",
+    "question": "For a 'duplicate' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "12.6.1",
+          "reason_title": "Duplicate Processing",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4834",
+          "reason_title": "Point-of-Interaction Error",
+          "category": "processing_error",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "P08",
+          "reason_title": "Duplicate Charge",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-085",
+    "category": "paid_other_means",
+    "network": "comparison",
+    "question": "For a 'paid other means' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "12.6.2",
+          "reason_title": "Paid by Other Means",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4834",
+          "reason_title": "Point-of-Interaction Error",
+          "category": "processing_error",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "C14",
+          "reason_title": "Paid by Other Means",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-086",
+    "category": "incorrect_amount",
+    "network": "comparison",
+    "question": "For a 'incorrect amount' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "12.5",
+          "reason_title": "Incorrect Amount",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4834",
+          "reason_title": "Point-of-Interaction Error",
+          "category": "processing_error",
+          "time_limit_days": 90,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "P05",
+          "reason_title": "Incorrect Charge Amount",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-087",
+    "category": "not_received",
+    "network": "comparison",
+    "question": "For a 'not received' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "13.1",
+          "reason_title": "Merchandise/Services Not Received",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4855",
+          "reason_title": "Goods or Services Not Provided",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "C08",
+          "reason_title": "Goods/Services Not Received",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-088",
+    "category": "services_not_rendered",
+    "network": "comparison",
+    "question": "For a 'services not rendered' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "13.1",
+          "reason_title": "Merchandise/Services Not Received",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4859",
+          "reason_title": "Services Not Rendered",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "C08",
+          "reason_title": "Goods/Services Not Received",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-089",
+    "category": "cancelled_recurring",
+    "network": "comparison",
+    "question": "For a 'cancelled recurring' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "13.2",
+          "reason_title": "Cancelled Recurring Transaction",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4853",
+          "reason_title": "Cardholder Dispute (goods/services)",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "C28",
+          "reason_title": "Cancelled Recurring Billing",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-090",
+    "category": "not_as_described",
+    "network": "comparison",
+    "question": "For a 'not as described' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "13.3",
+          "reason_title": "Not as Described or Defective Merchandise/Services",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4853",
+          "reason_title": "Cardholder Dispute (goods/services)",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "C31",
+          "reason_title": "Goods/Services Not as Described",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-091",
+    "category": "defective",
+    "network": "comparison",
+    "question": "For a 'defective' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "13.3",
+          "reason_title": "Not as Described or Defective Merchandise/Services",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4853",
+          "reason_title": "Cardholder Dispute (goods/services)",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "C32",
+          "reason_title": "Goods/Services Damaged or Defective",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-092",
+    "category": "credit_not_processed",
+    "network": "comparison",
+    "question": "For a 'credit not processed' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "13.6",
+          "reason_title": "Credit Not Processed",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4860",
+          "reason_title": "Credit Not Processed",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "C02",
+          "reason_title": "Credit Not Processed",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-093",
+    "category": "cancelled_goods",
+    "network": "comparison",
+    "question": "For a 'cancelled goods' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "13.7",
+          "reason_title": "Cancelled Merchandise/Services",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4853",
+          "reason_title": "Cardholder Dispute (goods/services)",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "C05",
+          "reason_title": "Goods/Services Canceled",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-094",
+    "category": "goods_returned",
+    "network": "comparison",
+    "question": "For a 'goods returned' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "13.6",
+          "reason_title": "Credit Not Processed",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4860",
+          "reason_title": "Credit Not Processed",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "C04",
+          "reason_title": "Goods/Services Returned or Refused",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-095",
+    "category": "misrepresentation",
+    "network": "comparison",
+    "question": "For a 'misrepresentation' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "13.5",
+          "reason_title": "Misrepresentation",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4853",
+          "reason_title": "Cardholder Dispute (goods/services)",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "C31",
+          "reason_title": "Goods/Services Not as Described",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-096",
+    "category": "does_not_recognize",
+    "network": "comparison",
+    "question": "For a 'does not recognize' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "10.4",
+          "reason_title": "Other Fraud - Card Absent Environment",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": true,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4863",
+          "reason_title": "Cardholder Does Not Recognize",
+          "category": "fraud",
+          "time_limit_days": 60,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "F24",
+          "reason_title": "No Cardmember Authorization",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-097",
+    "category": "questionable_merchant",
+    "network": "comparison",
+    "question": "For a 'questionable merchant' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "10.4",
+          "reason_title": "Other Fraud - Card Absent Environment",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": true,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4849",
+          "reason_title": "Questionable Merchant Activity",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "F24",
+          "reason_title": "No Cardmember Authorization",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-098",
+    "category": "currency_error",
+    "network": "comparison",
+    "question": "For a 'currency error' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "12.5",
+          "reason_title": "Incorrect Amount",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4846",
+          "reason_title": "Correct Transaction Currency Code Not Provided",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "P05",
+          "reason_title": "Incorrect Charge Amount",
+          "category": "processing_error",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Original transaction receipt / TID",
+            "Settlement batch report showing single posting",
+            "Refund confirmation or credit transaction ARN",
+            "Currency conversion table used at capture"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-099",
+    "category": "chip_pin_shift",
+    "network": "comparison",
+    "question": "For a 'chip pin shift' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "10.1",
+          "reason_title": "EMV Liability Shift Counterfeit Fraud",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": true,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4871",
+          "reason_title": "Chip/PIN Liability Shift",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "F30",
+          "reason_title": "EMV Counterfeit",
+          "category": "fraud",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "AVS/CVV match logs",
+            "3-D Secure (3DS) authentication result (ECI/CAVV)",
+            "IP address, device fingerprint, geolocation",
+            "Shipping address vs billing address match",
+            "Delivery signature or tracking with signature",
+            "Prior transaction history with same cardholder"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  },
+  {
+    "id": "ctx-100",
+    "category": "no_show_hotel",
+    "network": "comparison",
+    "question": "For a 'no show hotel' scenario, compare Visa, Mastercard, and Amex: reason code, filing window, and evidence required.",
+    "answer": {
+      "networks": [
+        {
+          "network": "Visa",
+          "framework": "Visa Claims Resolution (VCR)",
+          "reason_code": "13.7",
+          "reason_title": "Cancelled Merchandise/Services",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://visa/vcr-2024.pdf"
+        },
+        {
+          "network": "Mastercard",
+          "framework": "Mastercard Chargeback Guide (MCCG)",
+          "reason_code": "4853",
+          "reason_title": "Cardholder Dispute (goods/services)",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://mastercard/mccg-2024.pdf"
+        },
+        {
+          "network": "American Express",
+          "framework": "Amex Merchant Regulations - Dispute Policy",
+          "reason_code": "C05",
+          "reason_title": "Goods/Services Canceled",
+          "category": "consumer_dispute",
+          "time_limit_days": 120,
+          "requires_pre_arbitration": false,
+          "evidence_checklist": [
+            "Proof of delivery (tracking + signature)",
+            "Signed contract or terms of service acceptance",
+            "Merchant refund / cancellation policy shown at checkout",
+            "Communication log with cardholder (email/chat)",
+            "Photos or specs of the item as sold",
+            "Recurring billing consent (opt-in record)"
+          ],
+          "source_ref": "internal://amex/dispute-policy-2024.pdf"
+        }
+      ],
+      "note": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date."
+    }
+  }
+]

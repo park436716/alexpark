@@ -1,0 +1,110 @@
+{
+  "networks": {
+    "visa": {
+      "name": "Visa",
+      "framework": "Visa Claims Resolution (VCR)",
+      "source": "internal://visa/vcr-2024.pdf",
+      "reason_codes": {
+        "10.1": {"title": "EMV Liability Shift Counterfeit Fraud", "category": "fraud", "time_limit_days": 120, "requires_pre_arbitration": true},
+        "10.3": {"title": "Other Fraud - Card Present", "category": "fraud", "time_limit_days": 120, "requires_pre_arbitration": true},
+        "10.4": {"title": "Other Fraud - Card Absent Environment", "category": "fraud", "time_limit_days": 120, "requires_pre_arbitration": true},
+        "11.1": {"title": "Card Recovery Bulletin", "category": "authorization", "time_limit_days": 75},
+        "11.2": {"title": "Declined Authorization", "category": "authorization", "time_limit_days": 75},
+        "11.3": {"title": "No Authorization", "category": "authorization", "time_limit_days": 90},
+        "12.1": {"title": "Late Presentment", "category": "processing_error", "time_limit_days": 120},
+        "12.5": {"title": "Incorrect Amount", "category": "processing_error", "time_limit_days": 120},
+        "12.6.1": {"title": "Duplicate Processing", "category": "processing_error", "time_limit_days": 120},
+        "12.6.2": {"title": "Paid by Other Means", "category": "processing_error", "time_limit_days": 120},
+        "13.1": {"title": "Merchandise/Services Not Received", "category": "consumer_dispute", "time_limit_days": 120},
+        "13.2": {"title": "Cancelled Recurring Transaction", "category": "consumer_dispute", "time_limit_days": 120},
+        "13.3": {"title": "Not as Described or Defective Merchandise/Services", "category": "consumer_dispute", "time_limit_days": 120},
+        "13.5": {"title": "Misrepresentation", "category": "consumer_dispute", "time_limit_days": 120},
+        "13.6": {"title": "Credit Not Processed", "category": "consumer_dispute", "time_limit_days": 120},
+        "13.7": {"title": "Cancelled Merchandise/Services", "category": "consumer_dispute", "time_limit_days": 120}
+      }
+    },
+    "mastercard": {
+      "name": "Mastercard",
+      "framework": "Mastercard Chargeback Guide (MCCG)",
+      "source": "internal://mastercard/mccg-2024.pdf",
+      "reason_codes": {
+        "4808": {"title": "Authorization-Related Chargeback", "category": "authorization", "time_limit_days": 90},
+        "4834": {"title": "Point-of-Interaction Error", "category": "processing_error", "time_limit_days": 90},
+        "4837": {"title": "No Cardholder Authorization", "category": "fraud", "time_limit_days": 120, "requires_pre_arbitration": true},
+        "4840": {"title": "Fraudulent Processing of Transactions", "category": "fraud", "time_limit_days": 120},
+        "4842": {"title": "Late Presentment", "category": "processing_error", "time_limit_days": 120},
+        "4846": {"title": "Correct Transaction Currency Code Not Provided", "category": "processing_error", "time_limit_days": 120},
+        "4849": {"title": "Questionable Merchant Activity", "category": "fraud", "time_limit_days": 120},
+        "4853": {"title": "Cardholder Dispute (goods/services)", "category": "consumer_dispute", "time_limit_days": 120},
+        "4855": {"title": "Goods or Services Not Provided", "category": "consumer_dispute", "time_limit_days": 120},
+        "4859": {"title": "Services Not Rendered", "category": "consumer_dispute", "time_limit_days": 120},
+        "4860": {"title": "Credit Not Processed", "category": "consumer_dispute", "time_limit_days": 120},
+        "4863": {"title": "Cardholder Does Not Recognize", "category": "fraud", "time_limit_days": 60},
+        "4870": {"title": "Chip Liability Shift", "category": "fraud", "time_limit_days": 120},
+        "4871": {"title": "Chip/PIN Liability Shift", "category": "fraud", "time_limit_days": 120}
+      }
+    },
+    "amex": {
+      "name": "American Express",
+      "framework": "Amex Merchant Regulations - Dispute Policy",
+      "source": "internal://amex/dispute-policy-2024.pdf",
+      "reason_codes": {
+        "F24": {"title": "No Cardmember Authorization", "category": "fraud", "time_limit_days": 120},
+        "F29": {"title": "Card Not Present", "category": "fraud", "time_limit_days": 120},
+        "F30": {"title": "EMV Counterfeit", "category": "fraud", "time_limit_days": 120},
+        "F31": {"title": "EMV Lost/Stolen", "category": "fraud", "time_limit_days": 120},
+        "A01": {"title": "Charge Amount Exceeds Authorization", "category": "authorization", "time_limit_days": 90},
+        "A02": {"title": "No Valid Authorization", "category": "authorization", "time_limit_days": 90},
+        "A08": {"title": "Authorization Approval Expired", "category": "authorization", "time_limit_days": 90},
+        "C02": {"title": "Credit Not Processed", "category": "consumer_dispute", "time_limit_days": 120},
+        "C04": {"title": "Goods/Services Returned or Refused", "category": "consumer_dispute", "time_limit_days": 120},
+        "C05": {"title": "Goods/Services Canceled", "category": "consumer_dispute", "time_limit_days": 120},
+        "C08": {"title": "Goods/Services Not Received", "category": "consumer_dispute", "time_limit_days": 120},
+        "C14": {"title": "Paid by Other Means", "category": "processing_error", "time_limit_days": 120},
+        "C28": {"title": "Cancelled Recurring Billing", "category": "consumer_dispute", "time_limit_days": 120},
+        "C31": {"title": "Goods/Services Not as Described", "category": "consumer_dispute", "time_limit_days": 120},
+        "C32": {"title": "Goods/Services Damaged or Defective", "category": "consumer_dispute", "time_limit_days": 120},
+        "P05": {"title": "Incorrect Charge Amount", "category": "processing_error", "time_limit_days": 120},
+        "P07": {"title": "Late Submission", "category": "processing_error", "time_limit_days": 120},
+        "P08": {"title": "Duplicate Charge", "category": "processing_error", "time_limit_days": 120}
+      }
+    }
+  },
+  "evidence_matrix": {
+    "fraud": [
+      "AVS/CVV match logs",
+      "3-D Secure (3DS) authentication result (ECI/CAVV)",
+      "IP address, device fingerprint, geolocation",
+      "Shipping address vs billing address match",
+      "Delivery signature or tracking with signature",
+      "Prior transaction history with same cardholder"
+    ],
+    "authorization": [
+      "Authorization approval code and timestamp",
+      "Authorization amount vs settled amount reconciliation",
+      "Force-post reason, if any",
+      "MID/TID and settlement batch reference"
+    ],
+    "processing_error": [
+      "Original transaction receipt / TID",
+      "Settlement batch report showing single posting",
+      "Refund confirmation or credit transaction ARN",
+      "Currency conversion table used at capture"
+    ],
+    "consumer_dispute": [
+      "Proof of delivery (tracking + signature)",
+      "Signed contract or terms of service acceptance",
+      "Merchant refund / cancellation policy shown at checkout",
+      "Communication log with cardholder (email/chat)",
+      "Photos or specs of the item as sold",
+      "Recurring billing consent (opt-in record)"
+    ]
+  },
+  "cross_network_notes": {
+    "chargeback_timeframe_default": "Most dispute categories carry a 120-day filing window from transaction date or expected delivery date.",
+    "fraud_shift_common": "Fraud codes generally shift liability to the party that did not support the higher security method (EMV chip, 3DS).",
+    "amex_note": "Amex operates as both issuer and acquirer in a closed-loop; there is no 'representment' filed to a separate issuer, only 'Second Presentment' back to Amex.",
+    "visa_vcr_note": "Visa's VCR platform auto-adjudicates many disputes at pre-arbitration if evidence thresholds are not met.",
+    "mastercard_com_note": "Mastercom is the Mastercard dispute workflow platform; second presentment must include compelling evidence per the reason code."
+  }
+}
