@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>간이 승인 예측 · 카드 신청 전 미리보기</title>
+<meta name="description" content="신용평가 조회 없이 예상 승인 확률을 미리 확인하세요">
+<meta property="og:type" content="website">
+<meta property="og:title" content="간이 승인 예측">
+<meta property="og:description" content="신용평가 조회 없이 예상 승인 확률을 30초 안에 확인 · 참고용 예상치">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#1e4fe0">
+<style>
+  :root {
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --surface-2: #f0f3f8;
+    --ink: #0a1220;
+    --ink-dim: #2a3345;
+    --muted: #5a6577;
+    --muted-2: #8a94a4;
+    --rule: #e5e9f0;
+    --rule-strong: #c8cfda;
+    --accent: #1e4fe0;
+    --accent-2: #0033b8;
+    --accent-soft: #e2ebff;
+    --ok: #16a373;
+    --warn: #d08016;
+    --caution: #b94b4b;
+    --shadow-sm: 0 1px 2px rgba(10, 18, 32, 0.04);
+    --shadow: 0 4px 24px rgba(10, 18, 32, 0.06);
+    --shadow-lg: 0 8px 40px rgba(10, 18, 32, 0.1);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR",
+            "Apple SD Gothic Neo", "Malgun Gothic", "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b0f16;
+      --surface: #141a25;
+      --surface-2: #1a2130;
+      --ink: #eef1f6;
+      --ink-dim: #cbd1dc;
+      --muted: #8a94a4;
+      --muted-2: #676f7f;
+      --rule: #232b3c;
+      --rule-strong: #34405a;
+      --accent: #4d78ff;
+      --accent-2: #7a9bff;
+      --accent-soft: #1e2a4d;
+      --ok: #2fc38e;
+      --warn: #eaa53a;
+      --caution: #e26565;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b0f16; --surface: #141a25; --surface-2: #1a2130;
+    --ink: #eef1f6; --ink-dim: #cbd1dc;
+    --muted: #8a94a4; --muted-2: #676f7f;
+    --rule: #232b3c; --rule-strong: #34405a;
+    --accent: #4d78ff; --accent-2: #7a9bff; --accent-soft: #1e2a4d;
+    --ok: #2fc38e; --warn: #eaa53a; --caution: #e26565;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 24px 20px 40px;
+    padding-bottom: max(40px, env(safe-area-inset-bottom));
+  }
+
+  /* Header */
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.01em;
+    margin-bottom: 20px;
+  }
+  .brand-mark {
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    position: relative;
+  }
+  .brand-mark::after {
+    content: "";
+    position: absolute; left: 4px; right: 4px; top: 7px;
+    height: 2px; background: rgba(255,255,255,0.85); border-radius: 1px;
+  }
+
+  /* Progress */
+  .progress {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 28px;
+  }
+  .progress-step {
+    flex: 1;
+    height: 4px;
+    background: var(--rule);
+    border-radius: 2px;
+    transition: background .2s;
+  }
+  .progress-step.active { background: var(--accent); }
+  .progress-step.done { background: var(--accent); opacity: 0.5; }
+
+  /* Screen */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .step-eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 24px;
+    max-width: 40ch;
+  }
+
+  /* Consent card */
+  .consent {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 16px 18px;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+  }
+  .consent strong { color: var(--ink-dim); font-weight: 600; }
+
+  /* Fields */
+  .fields { display: flex; flex-direction: column; gap: 14px; }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .field-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-dim);
+  }
+  .field-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: -2px;
+  }
+
+  select, .select-native {
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1.5px solid var(--rule-strong);
+    border-radius: 12px;
+    padding: 14px 44px 14px 16px;
+    width: 100%;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'><path d='M4 6L8 10L12 6' stroke='%235a6577' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    transition: border-color .12s;
+  }
+  select:focus { outline: none; border-color: var(--accent); }
+
+  /* Chip group */
+  .chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    font-family: var(--sans);
+    font-size: 13.5px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1.5px solid var(--rule-strong);
+    background: var(--surface);
+    color: var(--ink-dim);
+    cursor: pointer;
+    user-select: none;
+    transition: all .15s;
+  }
+  .chip:hover { border-color: var(--muted); }
+  .chip[aria-pressed="true"] {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  /* Slider */
+  .slider-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .slider-value {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  input[type="range"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--rule);
+    border-radius: 999px;
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 3px solid var(--accent);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 3px solid var(--accent);
+    cursor: pointer;
+  }
+  .slider-scale {
+    display: flex; justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px; color: var(--muted-2);
+    margin-top: 6px;
+  }
+
+  /* CTA buttons */
+  .cta-row {
+    display: flex; gap: 10px;
+    margin-top: 28px;
+  }
+  button.cta {
+    flex: 1;
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    transition: transform .08s, background .12s;
+  }
+  button.cta:active { transform: scale(0.985); }
+  button.cta-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  button.cta-primary:hover { background: var(--accent-2); }
+  button.cta-primary:disabled {
+    background: var(--rule-strong);
+    color: var(--muted);
+    cursor: not-allowed;
+  }
+  button.cta-secondary {
+    background: var(--surface);
+    color: var(--ink-dim);
+    border: 1.5px solid var(--rule-strong);
+  }
+  button.cta-secondary:hover { border-color: var(--muted); }
+
+  /* Result screen */
+  .result-hero {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 28px 24px 24px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-hero::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--accent);
+  }
+  .result-hero.tier-ok::before { background: var(--ok); }
+  .result-hero.tier-warn::before { background: var(--warn); }
+  .result-hero.tier-caution::before { background: var(--caution); }
+
+  .result-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .result-headline {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 8px 0 20px;
+    color: var(--ink);
+  }
+  .result-headline.tier-ok { color: var(--ok); }
+  .result-headline.tier-warn { color: var(--warn); }
+  .result-headline.tier-caution { color: var(--caution); }
+
+  .prob-ring {
+    width: 168px; height: 168px;
+    margin: 0 auto 16px;
+    position: relative;
+  }
+  .prob-ring svg { transform: rotate(-90deg); }
+  .prob-ring-track {
+    stroke: var(--rule);
+    stroke-width: 12;
+    fill: none;
+  }
+  .prob-ring-fill {
+    stroke: var(--accent);
+    stroke-width: 12;
+    fill: none;
+    stroke-linecap: round;
+    transition: stroke-dashoffset .6s cubic-bezier(.4, .2, .2, 1);
+  }
+  .prob-ring-fill.tier-ok { stroke: var(--ok); }
+  .prob-ring-fill.tier-warn { stroke: var(--warn); }
+  .prob-ring-fill.tier-caution { stroke: var(--caution); }
+  .prob-inner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  .prob-value {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .prob-value .pct { font-size: 22px; color: var(--muted); margin-left: 2px; }
+  .prob-caption { font-size: 11.5px; color: var(--muted); }
+
+  /* Tips card */
+  .tips {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 22px 22px 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--rule);
+    margin-bottom: 16px;
+  }
+  .tips-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tips-title::before {
+    content: "";
+    width: 4px; height: 14px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  .tip {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .tip:last-child { border-bottom: none; padding-bottom: 0; }
+  .tip:first-child { padding-top: 0; }
+  .tip-num {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+  }
+  .tip-body { font-size: 13.5px; color: var(--ink-dim); line-height: 1.5; }
+  .tip-body strong { color: var(--ink); font-weight: 600; }
+
+  /* Disclaimer */
+  .disclaimer {
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 20px;
+  }
+  .disclaimer strong { color: var(--ink-dim); font-weight: 600; }
+
+  /* Result CTA */
+  .result-actions { display: flex; flex-direction: column; gap: 10px; }
+  .result-actions button.cta { width: 100%; }
+
+  /* Loading */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .loading.active { display: block; }
+  .loading-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 16px 0 4px;
+  }
+  .loading-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .spinner {
+    width: 44px; height: 44px;
+    border: 3px solid var(--rule);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .spinner { animation: none; }
+    .prob-ring-fill { transition: none; }
+  }
+
+  /* Bottom notice */
+  .bottom-notice {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted-2);
+    margin-top: 32px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true"></div>
+    <span>간이 승인 예측 · Prototype</span>
+  </div>
+
+  <div class="progress">
+    <div class="progress-step" id="prog-1"></div>
+    <div class="progress-step" id="prog-2"></div>
+    <div class="progress-step" id="prog-3"></div>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="screen" id="screen-1">
+    <div class="step-eyebrow">Step 1 · 기본 정보</div>
+    <h1>먼저, 신청자님에 대해 알려주세요</h1>
+    <p class="subtitle">30초 안에 예상 승인 확률을 확인할 수 있어요. 신용평가 조회는 진행되지 않습니다.</p>
+
+    <div class="consent">
+      <strong>안심하세요.</strong> 입력하신 정보는 브라우저에서만 처리되며 어떤 서버로도 전송되지 않습니다.
+      이 결과는 실제 심사가 아닌 참고용 <strong>예상치</strong>입니다.
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <label class="field-label" for="f-age">나이</label>
+        <div class="slider-row">
+          <input type="range" id="f-age" min="19" max="70" step="1" value="32">
+          <span class="slider-value" id="f-age-val">만 32세</span>
+        </div>
+        <div class="slider-scale"><span>19</span><span>45</span><span>70+</span></div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">결혼 여부</span>
+        <div class="chip-group" data-field="marital_status">
+          <button class="chip" type="button" data-value="single">미혼</button>
+          <button class="chip" type="button" data-value="married" aria-pressed="true">기혼</button>
+          <button class="chip" type="button" data-value="divorced">이혼</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">주거 형태</span>
+        <div class="chip-group" data-field="housing">
+          <button class="chip" type="button" data-value="owned">자가</button>
+          <button class="chip" type="button" data-value="jeonse" aria-pressed="true">전세</button>
+          <button class="chip" type="button" data-value="monthly_rent">월세</button>
+          <button class="chip" type="button" data-value="family_owned">가족 소유</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">현재 신용카드를 사용 중이신가요?</span>
+        <div class="chip-group" data-field="has_other_cards">
+          <button class="chip" type="button" data-value="true" aria-pressed="true">예</button>
+          <button class="chip" type="button" data-value="false">아니오</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button class="cta cta-primary" data-next="2">다음</button>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="screen" id="screen-2">
+    <div class="step-eyebrow">Step 2 · 재직 · 소득</div>
+    <h1>직장과 소득 정보를 알려주세요</h1>
+    <p class="subtitle">가장 최근 확정 소득 기준으로 입력해주세요.</p>
+
+    <div class="fields">
+      <div class="field">
+        <label class="field-label" for="f-job">직업군</label>
+        <select id="f-job">
+          <option value="office" selected>사무직 (일반 직장인)</option>
+          <option value="professional">전문직</option>
+          <option value="civil_servant">공무원</option>
+          <option value="self_employed">자영업</option>
+          <option value="freelancer">프리랜서</option>
+          <option value="part_time">시간제 근무</option>
+          <option value="student">학생</option>
+          <option value="unemployed">현재 무직</option>
+          <option value="other">기타</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="f-emp">근무처 규모</label>
+        <select id="f-emp">
+          <option value="large">대기업 (임직원 300인 이상)</option>
+          <option value="mid" selected>중견기업</option>
+          <option value="small">중소기업 / 스타트업</option>
+          <option value="gov">공공기관</option>
+          <option value="none">해당 없음</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="f-years">재직 기간</label>
+        <div class="slider-row">
+          <input type="range" id="f-years" min="0" max="20" step="0.5" value="3.5">
+          <span class="slider-value" id="f-years-val">3.5년</span>
+        </div>
+        <div class="slider-scale"><span>0</span><span>10년</span><span>20년+</span></div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="f-income">연 소득 (세전)</label>
+        <div class="slider-row">
+          <input type="range" id="f-income" min="0" max="150000000" step="1000000" value="55000000">
+          <span class="slider-value" id="f-income-val">5,500만원</span>
+        </div>
+        <div class="slider-scale"><span>0</span><span>7,500만</span><span>1.5억+</span></div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="f-limit">희망 이용 한도</label>
+        <div class="slider-row">
+          <input type="range" id="f-limit" min="500000" max="50000000" step="500000" value="5000000">
+          <span class="slider-value" id="f-limit-val">500만원</span>
+        </div>
+        <div class="slider-scale"><span>50만</span><span>2,500만</span><span>5,000만+</span></div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button class="cta cta-secondary" data-back="1">이전</button>
+      <button class="cta cta-primary" id="submit-btn">결과 확인</button>
+    </div>
+  </section>
+
+  <!-- LOADING -->
+  <div class="loading" id="loading">
+    <div class="spinner" aria-hidden="true"></div>
+    <div class="loading-title">예상 승인 확률 계산 중</div>
+    <div class="loading-subtitle">신청 정보를 검토하고 있어요</div>
+  </div>
+
+  <!-- STEP 3: RESULT -->
+  <section class="screen" id="screen-3">
+    <div class="result-hero" id="result-hero">
+      <div class="result-label">예상 승인 확률</div>
+      <div class="prob-ring">
+        <svg width="168" height="168" viewBox="0 0 168 168">
+          <circle class="prob-ring-track" cx="84" cy="84" r="72"/>
+          <circle class="prob-ring-fill" id="ring-fill" cx="84" cy="84" r="72"
+                  stroke-dasharray="452.4" stroke-dashoffset="452.4"/>
+        </svg>
+        <div class="prob-inner">
+          <div class="prob-value"><span id="pval">0</span><span class="pct">%</span></div>
+          <div class="prob-caption">신용평가 조회 없이 산출</div>
+        </div>
+      </div>
+      <div class="result-headline" id="result-headline">계산 중...</div>
+    </div>
+
+    <div class="tips" id="tips-card">
+      <div class="tips-title">승인 확률을 높이는 방법</div>
+      <div id="tip-list"></div>
+    </div>
+
+    <div class="disclaimer">
+      <strong>안내</strong> · 본 결과는 입력하신 정보만을 기반으로 한 <strong>참고용 예상치</strong>입니다.
+      실제 카드 심사에서는 신용평가 조회, 소득 증빙, 기존 부채 확인 등의 절차를 거쳐 최종 승인 여부가 결정됩니다.
+      본 예측이 실제 승인을 보장하거나 거절을 의미하지 않습니다.
+    </div>
+
+    <div class="result-actions">
+      <button class="cta cta-primary" id="apply-btn">정식 심사 신청하기</button>
+      <button class="cta cta-secondary" data-reset="1">처음부터 다시</button>
+    </div>
+  </section>
+
+  <div class="bottom-notice">
+    본 서비스는 프로토타입입니다 · 학습 데이터는 합성 데이터입니다<br>
+    실제 배포 전 실제 승인/연체 데이터로 재학습 및 규제 검토가 필요합니다
+  </div>
+</div>
+
+<script>
+const REPORT = __REPORT_DATA__;
+const LR = REPORT.lr_export;
+
+/* ---- Consumer-friendly tip templates ---- */
+/* Whitelist: only features the applicant can act on. Anti-fraud signals
+   are excluded intentionally so this UI never teaches abuse. */
+const TIP_MAP = {
+  requested_credit_limit: {
+    when: "high",
+    body: "요청하신 <strong>이용 한도가 소득 대비 다소 높습니다</strong>. 초기에는 한도를 낮춰 신청하시면 승인 확률이 크게 올라갑니다."
+  },
+  employment_years: {
+    when: "low",
+    body: "<strong>재직 기간이 길수록</strong> 심사에서 안정성 점수가 올라갑니다. 6개월 이상 재직 후 신청을 권장합니다."
+  },
+  annual_income: {
+    when: "low",
+    body: "입력하신 <strong>연 소득이 낮게 반영</strong>되어 있습니다. 최근 확정 소득이 있다면 정확한 금액으로 입력해 주세요."
+  },
+  has_other_cards: {
+    when: "false",
+    body: "기존 <strong>카드 사용 이력</strong>이 있으면 상환 성실도가 확인되어 유리합니다. 체크카드 사용 이력도 도움이 됩니다."
+  },
+  age: {
+    when: "low",
+    body: "만 25세 미만의 경우 소득·재직 조건이 다소 엄격하게 검토됩니다. 6개월~1년의 재직 이력이 쌓이면 상당히 개선됩니다."
+  },
+  stability_score: {
+    when: "low",
+    body: "재직·거주 안정성이 낮게 평가되었습니다. 현 주소지에 <strong>1년 이상 거주</strong>하시면 유리합니다."
+  },
+  housing: {
+    when: "any",
+    body: "<strong>자가 또는 전세 거주</strong>가 안정성 지표에 유리하게 반영됩니다."
+  },
+  employer_size: {
+    when: "any",
+    body: "<strong>정규직 · 대기업 · 공공기관 재직</strong>일수록 안정성 점수가 높게 산정됩니다."
+  },
+};
+
+/* Generic fallbacks when no whitelisted tip fires */
+const GENERIC_TIPS = [
+  { body: "<strong>소득이 안정적으로 확인</strong>되는 경우 승인 가능성이 높습니다. 급여이체 통장 등록도 도움이 됩니다." },
+  { body: "이미 다른 <strong>금융 거래 이력이 좋은</strong> 상태라면 별도 조회 없이도 우수한 결과가 나올 가능성이 큽니다." },
+  { body: "심사에서는 <strong>희망 한도가 소득 대비 적정한지</strong>가 중요한 판단 요소입니다." },
+];
+
+/* ---- Session tracking (device / behavior signals) ---- */
+const SESSION = {
+  startTime: Date.now(),
+  keystrokes: 0,
+  pastes: 0,
+  editCount: 0,
+  fieldsEdited: new Set(),
+};
+document.addEventListener("keydown", () => { SESSION.keystrokes++; }, true);
+document.addEventListener("paste", () => { SESSION.pastes++; }, true);
+document.addEventListener("input", (e) => {
+  const t = e.target;
+  if (t && t.id) {
+    if (SESSION.fieldsEdited.has(t.id)) SESSION.editCount++;
+    else SESSION.fieldsEdited.add(t.id);
+  }
+}, true);
+
+/* ---- Application state ---- */
+const STATE = {
+  age: 32, marital_status: "married", dependents: 0, education: "bachelor",
+  job_category: "office", employer_size: "mid", employment_years: 3.5,
+  annual_income: 55_000_000, income_type: "salary", housing: "jeonse",
+  residence_years: 2.0, requested_credit_limit: 5_000_000, has_other_cards: true,
+  device_type: "mobile", os_family: "ios", os_version_age_days: 30,
+  browser: "safari", is_emulator_signal: false, timezone_offset: 540,
+  ip_country: "KR", ip_country_matches_locale: true, is_vpn_proxy: false,
+  device_seen_count_7d: 0, device_seen_count_90d: 0,
+  session_duration_sec: 60, keystroke_count: 200, paste_ratio: 0.0,
+  field_edit_count: 0, avg_field_dwell_sec: 5.0, submit_hour: 14,
+  submit_day_of_week: 2, autofill_used: false, back_navigation_count: 0,
+  time_since_prior_attempt_min: -1,
+};
+
+/* ---- LR scoring in JS (same as internal dashboard) ---- */
+function buildVec(inputs) {
+  const feat = {};
+  for (const col of LR.numeric_cols) feat[col] = inputs[col] ?? null;
+  for (const col of LR.bool_cols)
+    feat[col] = inputs[col] === true ? 1 : inputs[col] === false ? 0 : null;
+  for (const col of LR.categorical_cols) {
+    const m = LR.category_maps[col] || {};
+    feat[col] = m[inputs[col] ?? "__missing__"] ?? null;
+  }
+  const income = inputs.annual_income ?? 0;
+  const limit = Math.max(inputs.requested_credit_limit ?? 1, 1);
+  feat.income_to_limit_ratio = income / limit;
+  feat.log_income = Math.log1p(Math.max(income, 0));
+  feat.log_requested_limit = Math.log1p(Math.max(limit, 0));
+  feat.stability_score = (inputs.employment_years ?? 0) + 0.5 * (inputs.residence_years ?? 0);
+  const hour = inputs.submit_hour ?? 12;
+  feat.is_night_submit = hour >= 0 && hour < 5 ? 1 : 0;
+  feat.is_new_device_90d = (inputs.device_seen_count_90d ?? 0) === 0 ? 1 : 0;
+  feat.keystrokes_per_sec = (inputs.keystroke_count ?? 0) / Math.max(inputs.session_duration_sec ?? 1, 1);
+  const age = inputs.age ?? 0;
+  let bucket = "60s_plus";
+  if (age <= 29) bucket = "20s_and_below";
+  else if (age <= 39) bucket = "30s";
+  else if (age <= 49) bucket = "40s";
+  else if (age <= 59) bucket = "50s";
+  feat.age_bucket = LR.category_maps.age_bucket[bucket] ?? null;
+
+  const vec = LR.feature_names.map(n => feat[n]);
+  for (let i = 0; i < vec.length; i++) {
+    if (vec[i] === null || vec[i] === undefined || Number.isNaN(vec[i])) {
+      vec[i] = LR.medians[i];
+    }
+  }
+  return vec;
+}
+function scoreLR(inputs) {
+  const vec = buildVec(inputs);
+  let logit = LR.intercept;
+  const contribs = new Array(vec.length);
+  for (let i = 0; i < vec.length; i++) {
+    const scaled = (vec[i] - LR.means[i]) / (LR.stds[i] || 1);
+    contribs[i] = LR.coef[i] * scaled;
+    logit += contribs[i];
+  }
+  return {
+    p: 1 / (1 + Math.exp(-logit)),
+    contribs, featureNames: LR.feature_names,
+  };
+}
+
+/* ---- Tier labeling ---- */
+function tierFor(p) {
+  if (p >= 0.85) return { key: "ok", headline: "승인 가능성이 매우 높습니다", cta: "이대로 신청해도 좋아 보여요" };
+  if (p >= 0.60) return { key: "ok", headline: "승인 가능성이 있습니다", cta: "지금 신청해도 괜찮아 보여요" };
+  if (p >= 0.35) return { key: "warn", headline: "심사에서 자세히 검토됩니다", cta: "아래 팁을 확인해 보세요" };
+  return { key: "caution", headline: "지금은 어려울 수 있어요", cta: "아래 팁을 확인하고 보완 후 신청하는 것을 추천드려요" };
+}
+
+/* ---- Tip selection ---- */
+function pickTips(scoreResult, inputs) {
+  const { contribs, featureNames } = scoreResult;
+  const pairs = contribs
+    .map((c, i) => ({ c, name: featureNames[i] }))
+    .filter(p => p.c < -0.02)
+    .sort((a, b) => a.c - b.c);
+
+  const chosen = [];
+  const used = new Set();
+  for (const p of pairs) {
+    const tip = TIP_MAP[p.name];
+    if (!tip) continue; // hide fraud signals & non-actionable
+    if (used.has(p.name)) continue;
+    used.add(p.name);
+    chosen.push(tip);
+    if (chosen.length >= 3) break;
+  }
+  while (chosen.length < 2) chosen.push(GENERIC_TIPS[chosen.length % GENERIC_TIPS.length]);
+  return chosen.slice(0, 3);
+}
+
+/* ---- Screens ---- */
+function showScreen(step) {
+  document.querySelectorAll(".screen").forEach(el => el.classList.remove("active"));
+  document.getElementById("loading").classList.remove("active");
+  document.getElementById(`screen-${step}`).classList.add("active");
+  ["prog-1", "prog-2", "prog-3"].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove("active", "done");
+    if (i + 1 < step) el.classList.add("done");
+    if (i + 1 === step) el.classList.add("active");
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function showLoading() {
+  document.querySelectorAll(".screen").forEach(el => el.classList.remove("active"));
+  document.getElementById("loading").classList.add("active");
+}
+
+/* ---- Form wiring ---- */
+function updateSliderDisplay(id, valueId, formatter) {
+  const input = document.getElementById(id);
+  const disp = document.getElementById(valueId);
+  const update = () => {
+    STATE[id.slice(2).replace(/-/g, "_")] = Number(input.value);
+    disp.textContent = formatter(Number(input.value));
+  };
+  input.addEventListener("input", update);
+  update();
+}
+
+function bindChipGroup(groupEl, field) {
+  groupEl.querySelectorAll(".chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      groupEl.querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", "false"));
+      btn.setAttribute("aria-pressed", "true");
+      let v = btn.dataset.value;
+      if (v === "true") v = true;
+      else if (v === "false") v = false;
+      STATE[field] = v;
+    });
+  });
+}
+
+function initForm() {
+  // age
+  updateSliderDisplay("f-age", "f-age-val", v => `만 ${v}세`);
+  // custom mapping for input IDs → state keys
+  const yearsInput = document.getElementById("f-years");
+  const yearsDisp = document.getElementById("f-years-val");
+  yearsInput.addEventListener("input", () => {
+    STATE.employment_years = Number(yearsInput.value);
+    yearsDisp.textContent = Number(yearsInput.value).toFixed(1) + "년";
+  });
+  const incomeInput = document.getElementById("f-income");
+  const incomeDisp = document.getElementById("f-income-val");
+  incomeInput.addEventListener("input", () => {
+    const v = Number(incomeInput.value);
+    STATE.annual_income = v;
+    incomeDisp.textContent = v === 0 ? "없음" : (v / 10000).toLocaleString() + "만원";
+  });
+  const limitInput = document.getElementById("f-limit");
+  const limitDisp = document.getElementById("f-limit-val");
+  limitInput.addEventListener("input", () => {
+    const v = Number(limitInput.value);
+    STATE.requested_credit_limit = v;
+    limitDisp.textContent = (v / 10000).toLocaleString() + "만원";
+  });
+  // selects
+  document.getElementById("f-job").addEventListener("change", e => {
+    STATE.job_category = e.target.value;
+    if (["self_employed", "freelancer"].includes(e.target.value)) STATE.income_type = "business";
+    else STATE.income_type = "salary";
+  });
+  document.getElementById("f-emp").addEventListener("change", e => {
+    STATE.employer_size = e.target.value;
+  });
+  // chip groups
+  document.querySelectorAll(".chip-group").forEach(g => bindChipGroup(g, g.dataset.field));
+
+  // navigation
+  document.querySelectorAll("[data-next]").forEach(btn => {
+    btn.addEventListener("click", () => showScreen(Number(btn.dataset.next)));
+  });
+  document.querySelectorAll("[data-back]").forEach(btn => {
+    btn.addEventListener("click", () => showScreen(Number(btn.dataset.back)));
+  });
+  document.querySelectorAll("[data-reset]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      SESSION.startTime = Date.now();
+      SESSION.keystrokes = 0; SESSION.pastes = 0; SESSION.editCount = 0;
+      SESSION.fieldsEdited = new Set();
+      showScreen(1);
+    });
+  });
+
+  document.getElementById("submit-btn").addEventListener("click", () => {
+    // capture session signals
+    const now = new Date();
+    STATE.submit_hour = now.getHours();
+    STATE.submit_day_of_week = now.getDay();
+    STATE.session_duration_sec = Math.max(1, Math.round((Date.now() - SESSION.startTime) / 1000));
+    STATE.keystroke_count = SESSION.keystrokes;
+    const totalInputs = SESSION.keystrokes + SESSION.pastes;
+    STATE.paste_ratio = totalInputs > 0 ? SESSION.pastes / totalInputs : 0;
+    STATE.field_edit_count = SESSION.editCount;
+
+    showLoading();
+    setTimeout(runScore, 1400);
+  });
+
+  document.getElementById("apply-btn").addEventListener("click", () => {
+    // in a real deployment this routes to the actual card application form
+    alert("실제 배포 시에는 여기서 정식 카드 신청 페이지로 연결됩니다.");
+  });
+}
+
+/* ---- Result rendering ---- */
+function renderResult(p, tips) {
+  const tier = tierFor(p);
+  const hero = document.getElementById("result-hero");
+  hero.classList.remove("tier-ok", "tier-warn", "tier-caution");
+  hero.classList.add(`tier-${tier.key}`);
+
+  const ring = document.getElementById("ring-fill");
+  ring.classList.remove("tier-ok", "tier-warn", "tier-caution");
+  ring.classList.add(`tier-${tier.key}`);
+
+  const circumference = 2 * Math.PI * 72;
+  const offset = circumference * (1 - p);
+  requestAnimationFrame(() => {
+    ring.setAttribute("stroke-dashoffset", offset.toFixed(2));
+  });
+
+  // Animate the percent number
+  const pct = Math.round(p * 100);
+  const pvalEl = document.getElementById("pval");
+  const startAt = performance.now();
+  const duration = 700;
+  function step(t) {
+    const elapsed = Math.min(1, (t - startAt) / duration);
+    const eased = 1 - Math.pow(1 - elapsed, 3);
+    pvalEl.textContent = Math.round(pct * eased);
+    if (elapsed < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+
+  const headline = document.getElementById("result-headline");
+  headline.classList.remove("tier-ok", "tier-warn", "tier-caution");
+  headline.classList.add(`tier-${tier.key}`);
+  headline.textContent = tier.headline;
+
+  const list = document.getElementById("tip-list");
+  list.innerHTML = tips.map((t, i) => `
+    <div class="tip">
+      <div class="tip-num">${i + 1}</div>
+      <div class="tip-body">${t.body}</div>
+    </div>`).join("");
+
+  const applyBtn = document.getElementById("apply-btn");
+  if (tier.key === "caution") {
+    applyBtn.textContent = "그래도 신청하기";
+  } else {
+    applyBtn.textContent = "정식 심사 신청하기";
+  }
+}
+
+function runScore() {
+  const res = scoreLR(STATE);
+  const tips = pickTips(res, STATE);
+  showScreen(3);
+  renderResult(res.p, tips);
+}
+
+/* ---- Init ---- */
+initForm();
+showScreen(1);
+</script>
+</body>
+</html>
