@@ -1,0 +1,845 @@
+<title>차지백 트리아지 — 프로토타입</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --ground: #F5F6F8;
+    --surface: #FFFFFF;
+    --surface-2: #FAFBFC;
+    --ink: #0E1420;
+    --ink-2: #2B3444;
+    --muted: #5B6577;
+    --hairline: #EEF0F3;
+    --border: #DFE3EA;
+    --accent: #2F5FE0;
+    --accent-ink: #FFFFFF;
+    --accent-tint: #EAF0FE;
+    --focus: #2F5FE0;
+
+    --cat-fraud: #B23A48;
+    --cat-fraud-tint: #FCEEF0;
+    --cat-auth: #B67B00;
+    --cat-auth-tint: #FBF3E1;
+    --cat-proc: #5E5B7B;
+    --cat-proc-tint: #EEEDF5;
+    --cat-consumer: #2F7A5E;
+    --cat-consumer-tint: #E8F3EE;
+
+    --net-visa: #1A1F71;
+    --net-mc:   #B8001A;
+    --net-amex: #2E77BB;
+
+    --shadow-1: 0 1px 0 rgba(14,20,32,.03), 0 1px 2px rgba(14,20,32,.04);
+    --shadow-2: 0 2px 4px rgba(14,20,32,.04), 0 8px 24px rgba(14,20,32,.06);
+
+    --radius: 10px;
+    --radius-sm: 6px;
+
+    --font-ui: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", "Noto Sans KR", "Segoe UI", system-ui, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --font-serif: "Nanum Myeongjo", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0B0F17;
+      --surface: #141A25;
+      --surface-2: #10151E;
+      --ink: #E7EAF0;
+      --ink-2: #C1C7D2;
+      --muted: #8A93A3;
+      --hairline: #1A2130;
+      --border: #232B3D;
+      --accent: #7A9BFF;
+      --accent-ink: #0B0F17;
+      --accent-tint: #1A2340;
+      --focus: #7A9BFF;
+
+      --cat-fraud: #E88893;
+      --cat-fraud-tint: #2B1519;
+      --cat-auth: #E5B457;
+      --cat-auth-tint: #2A2210;
+      --cat-proc: #A8A4C7;
+      --cat-proc-tint: #1E1B2B;
+      --cat-consumer: #7BC3A2;
+      --cat-consumer-tint: #14251E;
+
+      --net-visa: #6C74C7;
+      --net-mc:   #E86775;
+      --net-amex: #6FA9DF;
+
+      --shadow-1: 0 1px 0 rgba(0,0,0,.4);
+      --shadow-2: 0 2px 4px rgba(0,0,0,.3), 0 12px 32px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0B0F17;
+    --surface: #141A25;
+    --surface-2: #10151E;
+    --ink: #E7EAF0;
+    --ink-2: #C1C7D2;
+    --muted: #8A93A3;
+    --hairline: #1A2130;
+    --border: #232B3D;
+    --accent: #7A9BFF;
+    --accent-ink: #0B0F17;
+    --accent-tint: #1A2340;
+    --focus: #7A9BFF;
+
+    --cat-fraud: #E88893;
+    --cat-fraud-tint: #2B1519;
+    --cat-auth: #E5B457;
+    --cat-auth-tint: #2A2210;
+    --cat-proc: #A8A4C7;
+    --cat-proc-tint: #1E1B2B;
+    --cat-consumer: #7BC3A2;
+    --cat-consumer-tint: #14251E;
+
+    --net-visa: #6C74C7;
+    --net-mc:   #E86775;
+    --net-amex: #6FA9DF;
+
+    --shadow-1: 0 1px 0 rgba(0,0,0,.4);
+    --shadow-2: 0 2px 4px rgba(0,0,0,.3), 0 12px 32px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    word-break: keep-all;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+
+  .app { display: grid; grid-template-rows: auto 1fr; min-height: 100vh; }
+
+  header.top {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: saturate(140%) blur(8px);
+    -webkit-backdrop-filter: saturate(140%) blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex; align-items: center; gap: 24px;
+  }
+  .wordmark { display: flex; align-items: baseline; gap: 10px; }
+  .wordmark .glyph {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .wordmark .glyph em { font-style: normal; color: var(--accent); font-weight: 600; }
+  .wordmark .kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 3px 8px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+  }
+  .top .spacer { flex: 1; }
+  .legend {
+    display: flex; gap: 14px; align-items: center;
+    font-size: 12px; color: var(--muted);
+  }
+  .legend .chip { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .swatch { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+  .swatch.visa { background: var(--net-visa); }
+  .swatch.mc   { background: var(--net-mc); }
+  .swatch.amex { background: var(--net-amex); }
+  .theme-toggle {
+    font: inherit; font-size: 12px;
+    color: var(--muted); background: transparent; border: 1px solid var(--border);
+    padding: 6px 10px; border-radius: 999px; cursor: pointer;
+  }
+  .theme-toggle:hover { color: var(--ink); border-color: var(--ink-2); }
+
+  main {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 24px;
+    padding: 24px;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  @media (max-width: 960px) {
+    main { grid-template-columns: 1fr; }
+  }
+
+  aside.rail {
+    display: flex; flex-direction: column; gap: 16px;
+    align-self: start;
+    position: sticky; top: 72px;
+  }
+  @media (max-width: 960px) { aside.rail { position: static; } }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow-1);
+  }
+  .panel h2 {
+    margin: 0 0 12px 0;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  textarea, input[type="text"], select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    border-radius: var(--radius-sm);
+    font: inherit;
+    font-size: 13.5px;
+  }
+  textarea { min-height: 88px; resize: vertical; }
+  textarea:focus, input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-tint);
+  }
+
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; min-width: 0; }
+
+  button.primary {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 14px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    font: inherit; font-weight: 600; font-size: 13.5px;
+    cursor: pointer;
+    transition: transform .06s ease;
+  }
+  button.primary:hover { filter: brightness(1.02); }
+  button.primary:active { transform: translateY(1px); }
+  button.ghost {
+    padding: 8px 12px;
+    background: transparent; color: var(--ink-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font: inherit; font-size: 12.5px;
+    cursor: pointer;
+  }
+  button.ghost:hover { border-color: var(--ink-2); }
+
+  .stack { display: flex; flex-direction: column; gap: 12px; }
+  .field-stack { display: flex; flex-direction: column; gap: 10px; }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .filter-chip {
+    font-size: 12px;
+    padding: 5px 10px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--surface-2);
+    color: var(--muted); cursor: pointer; letter-spacing: .01em;
+  }
+  .filter-chip[aria-pressed="true"] {
+    background: var(--accent-tint); border-color: var(--accent); color: var(--accent);
+    font-weight: 600;
+  }
+  .filter-chip:hover { border-color: var(--ink-2); color: var(--ink-2); }
+
+  .quick-help {
+    font-size: 12px; color: var(--muted);
+    padding-top: 4px;
+  }
+  .quick-help code {
+    font-family: var(--font-mono); font-size: 11.5px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    padding: 1px 5px; border-radius: 4px; color: var(--ink-2);
+  }
+
+  section.results { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+
+  .result-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--muted); font-size: 12px;
+  }
+  .result-meta .count {
+    font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-1);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 4px 1fr;
+  }
+  .card .stripe { background: var(--border); }
+  .card.net-visa .stripe { background: var(--net-visa); }
+  .card.net-mc   .stripe { background: var(--net-mc); }
+  .card.net-amex .stripe { background: var(--net-amex); }
+  .card.net-comparison .stripe {
+    background: linear-gradient(180deg, var(--net-visa) 0%, var(--net-visa) 33%, var(--net-mc) 33%, var(--net-mc) 66%, var(--net-amex) 66%, var(--net-amex) 100%);
+  }
+  .card .body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+
+  .card-header {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  }
+  .card-title {
+    font-size: 15.5px; font-weight: 700; color: var(--ink); margin: 0;
+    text-wrap: balance; letter-spacing: -0.005em;
+  }
+  .card-sub {
+    font-size: 11.5px; color: var(--muted);
+    letter-spacing: 0.02em; margin-top: 4px;
+  }
+  .card-score {
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .question {
+    font-size: 13.5px; color: var(--ink-2);
+    padding: 12px 14px;
+    background: var(--surface-2);
+    border-left: 2px solid var(--border);
+    border-radius: 4px;
+    line-height: 1.6;
+  }
+  .question .q-mark {
+    font-family: var(--font-serif); font-size: 16px;
+    color: var(--muted); margin-right: 6px; font-weight: 700;
+  }
+
+  .answer-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 14px;
+    row-gap: 10px;
+    align-items: baseline;
+    font-size: 13.5px;
+  }
+  .answer-grid dt {
+    color: var(--muted);
+    font-size: 11.5px; letter-spacing: 0.04em;
+    font-weight: 700;
+    padding-top: 2px;
+    white-space: nowrap;
+  }
+  .answer-grid dd { margin: 0; color: var(--ink); }
+
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .code-pill {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--accent-tint);
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+
+  .cat {
+    display: inline-block;
+    font-size: 11.5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+  .cat-fraud            { background: var(--cat-fraud-tint);    color: var(--cat-fraud); }
+  .cat-authorization    { background: var(--cat-auth-tint);     color: var(--cat-auth); }
+  .cat-processing_error { background: var(--cat-proc-tint);     color: var(--cat-proc); }
+  .cat-consumer_dispute { background: var(--cat-consumer-tint); color: var(--cat-consumer); }
+
+  .net-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600;
+  }
+  .net-label .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .net-label.visa .dot { background: var(--net-visa); }
+  .net-label.mc   .dot { background: var(--net-mc); }
+  .net-label.amex .dot { background: var(--net-amex); }
+
+  ul.evidence {
+    margin: 0; padding: 0; list-style: none;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px;
+  }
+  @media (max-width: 720px) { ul.evidence { grid-template-columns: 1fr; } }
+  ul.evidence li {
+    font-size: 12.5px; color: var(--ink-2);
+    padding-left: 16px; position: relative;
+    line-height: 1.5;
+  }
+  ul.evidence li::before {
+    content: ""; position: absolute; left: 0; top: 0.65em;
+    width: 4px; height: 4px; background: var(--muted); border-radius: 50%;
+  }
+
+  .compare-grid {
+    display: grid; grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 12px;
+  }
+  @media (max-width: 720px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-cell {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    background: var(--surface-2);
+    display: flex; flex-direction: column; gap: 8px;
+    border-top: 3px solid var(--border);
+  }
+  .compare-cell.visa { border-top-color: var(--net-visa); }
+  .compare-cell.mc   { border-top-color: var(--net-mc); }
+  .compare-cell.amex { border-top-color: var(--net-amex); }
+  .compare-cell .code {
+    font-family: var(--font-mono); font-size: 15px; font-weight: 600; color: var(--ink);
+  }
+  .compare-cell .t {
+    font-size: 12.5px; color: var(--ink-2); line-height: 1.45;
+  }
+  .compare-cell .meta {
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    display: flex; justify-content: space-between; gap: 8px;
+  }
+
+  .source {
+    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    padding-top: 4px; border-top: 1px dashed var(--hairline);
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px;
+  }
+  .source .path { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .empty {
+    padding: 40px 24px;
+    text-align: center; color: var(--muted);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .empty .em {
+    font-family: var(--font-serif); font-size: 18px; font-weight: 700;
+    color: var(--ink-2); display: block; margin-bottom: 6px;
+  }
+
+  footer.foot {
+    max-width: 1400px; margin: 0 auto; padding: 12px 24px 32px;
+    font-size: 11.5px; color: var(--muted);
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<script id="rules-data" type="application/json">{"networks": {"visa": {"name": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "source": "internal://visa/vcr-2024.pdf", "reason_codes": {"10.1": {"title": "EMV 책임전환 - 위조 사기", "category": "fraud", "time_limit_days": 120, "requires_pre_arbitration": true}, "10.3": {"title": "기타 사기 - 카드 소지 거래", "category": "fraud", "time_limit_days": 120, "requires_pre_arbitration": true}, "10.4": {"title": "기타 사기 - 카드 미소지(CNP) 거래", "category": "fraud", "time_limit_days": 120, "requires_pre_arbitration": true}, "11.1": {"title": "카드 회수 공지 미확인", "category": "authorization", "time_limit_days": 75}, "11.2": {"title": "승인거절 후 결제", "category": "authorization", "time_limit_days": 75}, "11.3": {"title": "무승인 거래", "category": "authorization", "time_limit_days": 90}, "12.1": {"title": "지연 제출", "category": "processing_error", "time_limit_days": 120}, "12.5": {"title": "결제금액 오류", "category": "processing_error", "time_limit_days": 120}, "12.6.1": {"title": "중복 결제", "category": "processing_error", "time_limit_days": 120}, "12.6.2": {"title": "타 결제수단으로 이미 지불", "category": "processing_error", "time_limit_days": 120}, "13.1": {"title": "상품/서비스 미수령", "category": "consumer_dispute", "time_limit_days": 120}, "13.2": {"title": "정기결제 취소 후 청구", "category": "consumer_dispute", "time_limit_days": 120}, "13.3": {"title": "표시와 다름 또는 하자 상품/서비스", "category": "consumer_dispute", "time_limit_days": 120}, "13.5": {"title": "허위 표시", "category": "consumer_dispute", "time_limit_days": 120}, "13.6": {"title": "환불 미처리", "category": "consumer_dispute", "time_limit_days": 120}, "13.7": {"title": "주문 취소 미반영", "category": "consumer_dispute", "time_limit_days": 120}}}, "mastercard": {"name": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "source": "internal://mastercard/mccg-2024.pdf", "reason_codes": {"4808": {"title": "승인 관련 차지백", "category": "authorization", "time_limit_days": 90}, "4834": {"title": "결제 처리 오류", "category": "processing_error", "time_limit_days": 90}, "4837": {"title": "카드소지자 미승인 거래", "category": "fraud", "time_limit_days": 120, "requires_pre_arbitration": true}, "4840": {"title": "부정 처리 거래", "category": "fraud", "time_limit_days": 120}, "4842": {"title": "지연 제출", "category": "processing_error", "time_limit_days": 120}, "4846": {"title": "잘못된 통화코드 사용", "category": "processing_error", "time_limit_days": 120}, "4849": {"title": "의심 가맹점 활동", "category": "fraud", "time_limit_days": 120}, "4853": {"title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "time_limit_days": 120}, "4855": {"title": "상품·서비스 미제공", "category": "consumer_dispute", "time_limit_days": 120}, "4859": {"title": "서비스 미이행", "category": "consumer_dispute", "time_limit_days": 120}, "4860": {"title": "환불 미처리", "category": "consumer_dispute", "time_limit_days": 120}, "4863": {"title": "카드소지자 미인지 거래", "category": "fraud", "time_limit_days": 60}, "4870": {"title": "칩 카드 책임전환", "category": "fraud", "time_limit_days": 120}, "4871": {"title": "칩/PIN 책임전환", "category": "fraud", "time_limit_days": 120}}}, "amex": {"name": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "source": "internal://amex/dispute-policy-2024.pdf", "reason_codes": {"F24": {"title": "회원 미승인 결제", "category": "fraud", "time_limit_days": 120}, "F29": {"title": "카드 미소지(CNP) 사기", "category": "fraud", "time_limit_days": 120}, "F30": {"title": "EMV 위조", "category": "fraud", "time_limit_days": 120}, "F31": {"title": "EMV 분실/도난", "category": "fraud", "time_limit_days": 120}, "A01": {"title": "승인금액 초과", "category": "authorization", "time_limit_days": 90}, "A02": {"title": "유효 승인 없음", "category": "authorization", "time_limit_days": 90}, "A08": {"title": "승인 유효기간 경과", "category": "authorization", "time_limit_days": 90}, "C02": {"title": "환불 미처리", "category": "consumer_dispute", "time_limit_days": 120}, "C04": {"title": "반품·인수거절 상품", "category": "consumer_dispute", "time_limit_days": 120}, "C05": {"title": "주문 취소 상품·서비스", "category": "consumer_dispute", "time_limit_days": 120}, "C08": {"title": "상품·서비스 미수령", "category": "consumer_dispute", "time_limit_days": 120}, "C14": {"title": "타 결제수단으로 이미 지불", "category": "processing_error", "time_limit_days": 120}, "C28": {"title": "정기결제 취소 후 청구", "category": "consumer_dispute", "time_limit_days": 120}, "C31": {"title": "표시와 다른 상품·서비스", "category": "consumer_dispute", "time_limit_days": 120}, "C32": {"title": "손상·하자 상품·서비스", "category": "consumer_dispute", "time_limit_days": 120}, "P05": {"title": "결제금액 오류", "category": "processing_error", "time_limit_days": 120}, "P07": {"title": "지연 제출", "category": "processing_error", "time_limit_days": 120}, "P08": {"title": "중복 청구", "category": "processing_error", "time_limit_days": 120}}}}, "evidence_matrix": {"fraud": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "authorization": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "processing_error": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "consumer_dispute": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"]}, "cross_network_notes": {"chargeback_timeframe_default": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}</script>
+<script id="contexts-data" type="application/json">[{"id": "ctx-001", "category": "fraud_cnp", "category_label": "온라인(카드 미소지) 사기", "network": "visa", "question": "카드소지자가 대한전자에서 50,000원 온라인 결제를 자신이 하지 않았다고 주장합니다. 비자 (Visa) 대응 방안은?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "10.4", "reason_title": "기타 사기 - 카드 미소지(CNP) 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-002", "category": "fraud_cnp", "category_label": "온라인(카드 미소지) 사기", "network": "mastercard", "question": "카드소지자가 스카이북스에서 150,000원 온라인 결제를 자신이 하지 않았다고 주장합니다. 마스터카드 (Mastercard) 대응 방안은?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4837", "reason_title": "카드소지자 미승인 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-003", "category": "fraud_cnp", "category_label": "온라인(카드 미소지) 사기", "network": "amex", "question": "카드소지자가 그린그로서에서 329,000원 온라인 결제를 자신이 하지 않았다고 주장합니다. 아메리칸 익스프레스 (Amex) 대응 방안은?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "F29", "reason_title": "카드 미소지(CNP) 사기", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-004", "category": "fraud_cp", "category_label": "카드 소지 사기", "network": "visa", "question": "스카이북스 오프라인 매장에서 329,000원 결제. 카드는 지갑에 있었다는 주장입니다. 비자 (Visa)은 어떻게 처리하나요?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "10.3", "reason_title": "기타 사기 - 카드 소지 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-005", "category": "fraud_cp", "category_label": "카드 소지 사기", "network": "mastercard", "question": "그린그로서 오프라인 매장에서 1,380,000원 결제. 카드는 지갑에 있었다는 주장입니다. 마스터카드 (Mastercard)은 어떻게 처리하나요?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4837", "reason_title": "카드소지자 미승인 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-006", "category": "fraud_cp", "category_label": "카드 소지 사기", "network": "amex", "question": "여행월드 오프라인 매장에서 88,000원 결제. 카드는 지갑에 있었다는 주장입니다. 아메리칸 익스프레스 (Amex)은 어떻게 처리하나요?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "F24", "reason_title": "회원 미승인 결제", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-007", "category": "emv_counterfeit", "category_label": "EMV 위조", "network": "visa", "question": "마그네틱 전용 단말기에서 88,000원 위조카드 사용. 비자 (Visa) 코드와 손실 부담 주체는?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "10.1", "reason_title": "EMV 책임전환 - 위조 사기", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-008", "category": "emv_counterfeit", "category_label": "EMV 위조", "network": "mastercard", "question": "마그네틱 전용 단말기에서 590,000원 위조카드 사용. 마스터카드 (Mastercard) 코드와 손실 부담 주체는?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4870", "reason_title": "칩 카드 책임전환", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-009", "category": "emv_counterfeit", "category_label": "EMV 위조", "network": "amex", "question": "마그네틱 전용 단말기에서 50,000원 위조카드 사용. 아메리칸 익스프레스 (Amex) 코드와 손실 부담 주체는?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "F30", "reason_title": "EMV 위조", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-010", "category": "no_auth", "category_label": "무승인 결제", "network": "visa", "question": "가맹점이 승인 없이 50,000원을 강제매입(force-post)했습니다. 비자 (Visa) 분류는?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "11.3", "reason_title": "무승인 거래", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-011", "category": "no_auth", "category_label": "무승인 결제", "network": "mastercard", "question": "가맹점이 승인 없이 150,000원을 강제매입(force-post)했습니다. 마스터카드 (Mastercard) 분류는?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4808", "reason_title": "승인 관련 차지백", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-012", "category": "no_auth", "category_label": "무승인 결제", "network": "amex", "question": "가맹점이 승인 없이 329,000원을 강제매입(force-post)했습니다. 아메리칸 익스프레스 (Amex) 분류는?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "A02", "reason_title": "유효 승인 없음", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-013", "category": "declined_auth", "category_label": "승인거절 후 결제", "network": "visa", "question": "승인이 거절되었는데 가맹점이 329,000원을 그대로 매입했습니다. 비자 (Visa) 사유코드?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "11.2", "reason_title": "승인거절 후 결제", "category": "authorization", "category_ko": "승인", "time_limit_days": 75, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-014", "category": "declined_auth", "category_label": "승인거절 후 결제", "network": "mastercard", "question": "승인이 거절되었는데 가맹점이 1,380,000원을 그대로 매입했습니다. 마스터카드 (Mastercard) 사유코드?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4808", "reason_title": "승인 관련 차지백", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-015", "category": "declined_auth", "category_label": "승인거절 후 결제", "network": "amex", "question": "승인이 거절되었는데 가맹점이 88,000원을 그대로 매입했습니다. 아메리칸 익스프레스 (Amex) 사유코드?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "A02", "reason_title": "유효 승인 없음", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-016", "category": "expired_auth", "category_label": "승인 만료", "network": "visa", "question": "매입 45일 전에 받은 88,000원 승인이 만료되었습니다. 비자 (Visa)의 입장은?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "11.3", "reason_title": "무승인 거래", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-017", "category": "expired_auth", "category_label": "승인 만료", "network": "mastercard", "question": "매입 45일 전에 받은 590,000원 승인이 만료되었습니다. 마스터카드 (Mastercard)의 입장은?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4808", "reason_title": "승인 관련 차지백", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-018", "category": "expired_auth", "category_label": "승인 만료", "network": "amex", "question": "매입 45일 전에 받은 50,000원 승인이 만료되었습니다. 아메리칸 익스프레스 (Amex)의 입장은?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "A08", "reason_title": "승인 유효기간 경과", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-019", "category": "amount_exceeds_auth", "category_label": "승인금액 초과", "network": "visa", "question": "$50 승인을 받았는데 가맹점이 50,000원으로 매입했습니다. 비자 (Visa) 처리는?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "12.5", "reason_title": "결제금액 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-020", "category": "amount_exceeds_auth", "category_label": "승인금액 초과", "network": "mastercard", "question": "$50 승인을 받았는데 가맹점이 150,000원으로 매입했습니다. 마스터카드 (Mastercard) 처리는?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4834", "reason_title": "결제 처리 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-021", "category": "amount_exceeds_auth", "category_label": "승인금액 초과", "network": "amex", "question": "$50 승인을 받았는데 가맹점이 329,000원으로 매입했습니다. 아메리칸 익스프레스 (Amex) 처리는?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "A01", "reason_title": "승인금액 초과", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-022", "category": "late_presentment", "category_label": "지연 제출", "network": "visa", "question": "승인 후 45일 지나 329,000원이 정산되었습니다. 비자 (Visa) 차지백 리스크는?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "12.1", "reason_title": "지연 제출", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-023", "category": "late_presentment", "category_label": "지연 제출", "network": "mastercard", "question": "승인 후 45일 지나 1,380,000원이 정산되었습니다. 마스터카드 (Mastercard) 차지백 리스크는?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4842", "reason_title": "지연 제출", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-024", "category": "late_presentment", "category_label": "지연 제출", "network": "amex", "question": "승인 후 45일 지나 88,000원이 정산되었습니다. 아메리칸 익스프레스 (Amex) 차지백 리스크는?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "P07", "reason_title": "지연 제출", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-025", "category": "duplicate", "category_label": "중복 결제", "network": "visa", "question": "그린그로서에서 동일한 88,000원 주문이 두 번 청구되었습니다. 비자 (Visa) 사유코드?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "12.6.1", "reason_title": "중복 결제", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-026", "category": "duplicate", "category_label": "중복 결제", "network": "mastercard", "question": "여행월드에서 동일한 590,000원 주문이 두 번 청구되었습니다. 마스터카드 (Mastercard) 사유코드?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4834", "reason_title": "결제 처리 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-027", "category": "duplicate", "category_label": "중복 결제", "network": "amex", "question": "스트림플러스에서 동일한 50,000원 주문이 두 번 청구되었습니다. 아메리칸 익스프레스 (Amex) 사유코드?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "P08", "reason_title": "중복 청구", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-028", "category": "paid_other_means", "category_label": "타 결제수단 중복", "network": "visa", "question": "카드소지자가 배송 시 현금으로 지불했는데 카드로도 50,000원이 결제되었습니다. 비자 (Visa) 코드?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "12.6.2", "reason_title": "타 결제수단으로 이미 지불", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-029", "category": "paid_other_means", "category_label": "타 결제수단 중복", "network": "mastercard", "question": "카드소지자가 배송 시 현금으로 지불했는데 카드로도 150,000원이 결제되었습니다. 마스터카드 (Mastercard) 코드?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4834", "reason_title": "결제 처리 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-030", "category": "paid_other_means", "category_label": "타 결제수단 중복", "network": "amex", "question": "카드소지자가 배송 시 현금으로 지불했는데 카드로도 329,000원이 결제되었습니다. 아메리칸 익스프레스 (Amex) 코드?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C14", "reason_title": "타 결제수단으로 이미 지불", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-031", "category": "incorrect_amount", "category_label": "결제금액 오류", "network": "visa", "question": "가맹점 청구액이 329,000원이지만 서명 영수증에는 다른 금액이 적혀 있습니다. 비자 (Visa) 처리?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "12.5", "reason_title": "결제금액 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-032", "category": "incorrect_amount", "category_label": "결제금액 오류", "network": "mastercard", "question": "가맹점 청구액이 1,380,000원이지만 서명 영수증에는 다른 금액이 적혀 있습니다. 마스터카드 (Mastercard) 처리?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4834", "reason_title": "결제 처리 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-033", "category": "incorrect_amount", "category_label": "결제금액 오류", "network": "amex", "question": "가맹점 청구액이 88,000원이지만 서명 영수증에는 다른 금액이 적혀 있습니다. 아메리칸 익스프레스 (Amex) 처리?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "P05", "reason_title": "결제금액 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-034", "category": "not_received", "category_label": "상품·서비스 미수령", "network": "visa", "question": "핏프로짐에서 88,000원에 주문한 상품을 받지 못했습니다. 비자 (Visa) 사유코드와 기한은?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.1", "reason_title": "상품/서비스 미수령", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-035", "category": "not_received", "category_label": "상품·서비스 미수령", "network": "mastercard", "question": "대한전자에서 590,000원에 주문한 상품을 받지 못했습니다. 마스터카드 (Mastercard) 사유코드와 기한은?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4855", "reason_title": "상품·서비스 미제공", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-036", "category": "not_received", "category_label": "상품·서비스 미수령", "network": "amex", "question": "스카이북스에서 50,000원에 주문한 상품을 받지 못했습니다. 아메리칸 익스프레스 (Amex) 사유코드와 기한은?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C08", "reason_title": "상품·서비스 미수령", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-037", "category": "services_not_rendered", "category_label": "서비스 미이행", "network": "visa", "question": "50,000원을 결제했으나 서비스가 전혀 이행되지 않았습니다. 비자 (Visa) 접근 방식?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.1", "reason_title": "상품/서비스 미수령", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-038", "category": "services_not_rendered", "category_label": "서비스 미이행", "network": "mastercard", "question": "150,000원을 결제했으나 서비스가 전혀 이행되지 않았습니다. 마스터카드 (Mastercard) 접근 방식?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4859", "reason_title": "서비스 미이행", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-039", "category": "services_not_rendered", "category_label": "서비스 미이행", "network": "amex", "question": "329,000원을 결제했으나 서비스가 전혀 이행되지 않았습니다. 아메리칸 익스프레스 (Amex) 접근 방식?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C08", "reason_title": "상품·서비스 미수령", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-040", "category": "cancelled_recurring", "category_label": "정기결제 취소", "network": "visa", "question": "카드소지자가 구독을 해지했는데 가맹점이 329,000원을 계속 청구합니다. 비자 (Visa) 코드?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.2", "reason_title": "정기결제 취소 후 청구", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-041", "category": "cancelled_recurring", "category_label": "정기결제 취소", "network": "mastercard", "question": "카드소지자가 구독을 해지했는데 가맹점이 1,380,000원을 계속 청구합니다. 마스터카드 (Mastercard) 코드?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4853", "reason_title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-042", "category": "cancelled_recurring", "category_label": "정기결제 취소", "network": "amex", "question": "카드소지자가 구독을 해지했는데 가맹점이 88,000원을 계속 청구합니다. 아메리칸 익스프레스 (Amex) 코드?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C28", "reason_title": "정기결제 취소 후 청구", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-043", "category": "not_as_described", "category_label": "상품 불일치", "network": "visa", "question": "그린그로서에서 받은 상품이 상세페이지와 실질적으로 다릅니다(88,000원 결제). 비자 (Visa) 코드?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.3", "reason_title": "표시와 다름 또는 하자 상품/서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-044", "category": "not_as_described", "category_label": "상품 불일치", "network": "mastercard", "question": "여행월드에서 받은 상품이 상세페이지와 실질적으로 다릅니다(590,000원 결제). 마스터카드 (Mastercard) 코드?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4853", "reason_title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-045", "category": "not_as_described", "category_label": "상품 불일치", "network": "amex", "question": "스트림플러스에서 받은 상품이 상세페이지와 실질적으로 다릅니다(50,000원 결제). 아메리칸 익스프레스 (Amex) 코드?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C31", "reason_title": "표시와 다른 상품·서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-046", "category": "defective", "category_label": "하자·불량", "network": "visa", "question": "50,000원에 산 상품이 불량으로 도착했고 가맹점이 반품을 거부합니다. 비자 (Visa) 처리?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.3", "reason_title": "표시와 다름 또는 하자 상품/서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-047", "category": "defective", "category_label": "하자·불량", "network": "mastercard", "question": "150,000원에 산 상품이 불량으로 도착했고 가맹점이 반품을 거부합니다. 마스터카드 (Mastercard) 처리?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4853", "reason_title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-048", "category": "defective", "category_label": "하자·불량", "network": "amex", "question": "329,000원에 산 상품이 불량으로 도착했고 가맹점이 반품을 거부합니다. 아메리칸 익스프레스 (Amex) 처리?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C32", "reason_title": "손상·하자 상품·서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-049", "category": "credit_not_processed", "category_label": "환불 미처리", "network": "visa", "question": "가맹점이 329,000원 환불을 승인했으나 30일이 지나도 반영되지 않습니다. 비자 (Visa) 코드?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.6", "reason_title": "환불 미처리", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-050", "category": "credit_not_processed", "category_label": "환불 미처리", "network": "mastercard", "question": "가맹점이 1,380,000원 환불을 승인했으나 30일이 지나도 반영되지 않습니다. 마스터카드 (Mastercard) 코드?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4860", "reason_title": "환불 미처리", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-051", "category": "credit_not_processed", "category_label": "환불 미처리", "network": "amex", "question": "가맹점이 88,000원 환불을 승인했으나 30일이 지나도 반영되지 않습니다. 아메리칸 익스프레스 (Amex) 코드?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C02", "reason_title": "환불 미처리", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-052", "category": "cancelled_goods", "category_label": "주문 취소 미반영", "network": "visa", "question": "카드소지자가 배송 전 88,000원 주문을 취소했으나 결제되었습니다. 비자 (Visa) 코드?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.7", "reason_title": "주문 취소 미반영", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-053", "category": "cancelled_goods", "category_label": "주문 취소 미반영", "network": "mastercard", "question": "카드소지자가 배송 전 590,000원 주문을 취소했으나 결제되었습니다. 마스터카드 (Mastercard) 코드?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4853", "reason_title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-054", "category": "cancelled_goods", "category_label": "주문 취소 미반영", "network": "amex", "question": "카드소지자가 배송 전 50,000원 주문을 취소했으나 결제되었습니다. 아메리칸 익스프레스 (Amex) 코드?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C05", "reason_title": "주문 취소 상품·서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-055", "category": "goods_returned", "category_label": "반품 후 미환불", "network": "visa", "question": "카드소지자가 50,000원 상품을 반품했고 가맹점이 수령했으나 환불이 없습니다. 비자 (Visa) 접근?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.6", "reason_title": "환불 미처리", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-056", "category": "goods_returned", "category_label": "반품 후 미환불", "network": "mastercard", "question": "카드소지자가 150,000원 상품을 반품했고 가맹점이 수령했으나 환불이 없습니다. 마스터카드 (Mastercard) 접근?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4860", "reason_title": "환불 미처리", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-057", "category": "goods_returned", "category_label": "반품 후 미환불", "network": "amex", "question": "카드소지자가 329,000원 상품을 반품했고 가맹점이 수령했으나 환불이 없습니다. 아메리칸 익스프레스 (Amex) 접근?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C04", "reason_title": "반품·인수거절 상품", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-058", "category": "misrepresentation", "category_label": "허위 표시", "network": "visa", "question": "가맹점이 실제로 존재하지 않는 보증을 광고했습니다(329,000원). 비자 (Visa) 코드?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.5", "reason_title": "허위 표시", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-059", "category": "misrepresentation", "category_label": "허위 표시", "network": "mastercard", "question": "가맹점이 실제로 존재하지 않는 보증을 광고했습니다(1,380,000원). 마스터카드 (Mastercard) 코드?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4853", "reason_title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-060", "category": "misrepresentation", "category_label": "허위 표시", "network": "amex", "question": "가맹점이 실제로 존재하지 않는 보증을 광고했습니다(88,000원). 아메리칸 익스프레스 (Amex) 코드?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C31", "reason_title": "표시와 다른 상품·서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-061", "category": "does_not_recognize", "category_label": "미인지 결제", "network": "visa", "question": "카드소지자가 88,000원 청구를 인지하지 못하지만 아직 사기라고 확정하지 않았습니다. 비자 (Visa)의 첫 단계?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "10.4", "reason_title": "기타 사기 - 카드 미소지(CNP) 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-062", "category": "does_not_recognize", "category_label": "미인지 결제", "network": "mastercard", "question": "카드소지자가 590,000원 청구를 인지하지 못하지만 아직 사기라고 확정하지 않았습니다. 마스터카드 (Mastercard)의 첫 단계?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4863", "reason_title": "카드소지자 미인지 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 60, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-063", "category": "does_not_recognize", "category_label": "미인지 결제", "network": "amex", "question": "카드소지자가 50,000원 청구를 인지하지 못하지만 아직 사기라고 확정하지 않았습니다. 아메리칸 익스프레스 (Amex)의 첫 단계?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "F24", "reason_title": "회원 미승인 결제", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-064", "category": "questionable_merchant", "category_label": "의심 가맹점", "network": "visa", "question": "여러 카드소지자가 한 가맹점에서 동일한 50,000원 미승인 패턴을 보고했습니다. 비자 (Visa) 대응?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "10.4", "reason_title": "기타 사기 - 카드 미소지(CNP) 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-065", "category": "questionable_merchant", "category_label": "의심 가맹점", "network": "mastercard", "question": "여러 카드소지자가 한 가맹점에서 동일한 150,000원 미승인 패턴을 보고했습니다. 마스터카드 (Mastercard) 대응?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4849", "reason_title": "의심 가맹점 활동", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-066", "category": "questionable_merchant", "category_label": "의심 가맹점", "network": "amex", "question": "여러 카드소지자가 한 가맹점에서 동일한 329,000원 미승인 패턴을 보고했습니다. 아메리칸 익스프레스 (Amex) 대응?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "F24", "reason_title": "회원 미승인 결제", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-067", "category": "currency_error", "category_label": "통화 오류", "network": "visa", "question": "가맹점이 잘못된 통화로 정산해 329,000원 차액이 발생했습니다. 비자 (Visa) 코드?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "12.5", "reason_title": "결제금액 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-068", "category": "currency_error", "category_label": "통화 오류", "network": "mastercard", "question": "가맹점이 잘못된 통화로 정산해 1,380,000원 차액이 발생했습니다. 마스터카드 (Mastercard) 코드?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4846", "reason_title": "잘못된 통화코드 사용", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-069", "category": "currency_error", "category_label": "통화 오류", "network": "amex", "question": "가맹점이 잘못된 통화로 정산해 88,000원 차액이 발생했습니다. 아메리칸 익스프레스 (Amex) 코드?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "P05", "reason_title": "결제금액 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-070", "category": "chip_pin_shift", "category_label": "칩/PIN 책임전환", "network": "visa", "question": "PIN 우선(chip-and-PIN) 카드가 PIN 없이 88,000원에 사용되었습니다. 비자 (Visa)의 책임 판단은?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "10.1", "reason_title": "EMV 책임전환 - 위조 사기", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-071", "category": "chip_pin_shift", "category_label": "칩/PIN 책임전환", "network": "mastercard", "question": "PIN 우선(chip-and-PIN) 카드가 PIN 없이 590,000원에 사용되었습니다. 마스터카드 (Mastercard)의 책임 판단은?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4871", "reason_title": "칩/PIN 책임전환", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-072", "category": "chip_pin_shift", "category_label": "칩/PIN 책임전환", "network": "amex", "question": "PIN 우선(chip-and-PIN) 카드가 PIN 없이 50,000원에 사용되었습니다. 아메리칸 익스프레스 (Amex)의 책임 판단은?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "F30", "reason_title": "EMV 위조", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-073", "category": "no_show_hotel", "category_label": "호텔 노쇼", "network": "visa", "question": "호텔이 노쇼 명목으로 50,000원을 청구했지만 카드소지자는 사전에 취소했다고 주장합니다. 비자 (Visa) 처리?", "answer": {"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.7", "reason_title": "주문 취소 미반영", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}}, {"id": "ctx-074", "category": "no_show_hotel", "category_label": "호텔 노쇼", "network": "mastercard", "question": "호텔이 노쇼 명목으로 150,000원을 청구했지만 카드소지자는 사전에 취소했다고 주장합니다. 마스터카드 (Mastercard) 처리?", "answer": {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4853", "reason_title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}}, {"id": "ctx-075", "category": "no_show_hotel", "category_label": "호텔 노쇼", "network": "amex", "question": "호텔이 노쇼 명목으로 329,000원을 청구했지만 카드소지자는 사전에 취소했다고 주장합니다. 아메리칸 익스프레스 (Amex) 처리?", "answer": {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C05", "reason_title": "주문 취소 상품·서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}}, {"id": "ctx-076", "category": "fraud_cnp", "category_label": "온라인(카드 미소지) 사기", "network": "comparison", "question": "'온라인(카드 미소지) 사기' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "10.4", "reason_title": "기타 사기 - 카드 미소지(CNP) 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4837", "reason_title": "카드소지자 미승인 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "F29", "reason_title": "카드 미소지(CNP) 사기", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-077", "category": "fraud_cp", "category_label": "카드 소지 사기", "network": "comparison", "question": "'카드 소지 사기' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "10.3", "reason_title": "기타 사기 - 카드 소지 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4837", "reason_title": "카드소지자 미승인 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "F24", "reason_title": "회원 미승인 결제", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-078", "category": "emv_counterfeit", "category_label": "EMV 위조", "network": "comparison", "question": "'EMV 위조' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "10.1", "reason_title": "EMV 책임전환 - 위조 사기", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4870", "reason_title": "칩 카드 책임전환", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "F30", "reason_title": "EMV 위조", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-079", "category": "no_auth", "category_label": "무승인 결제", "network": "comparison", "question": "'무승인 결제' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "11.3", "reason_title": "무승인 거래", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4808", "reason_title": "승인 관련 차지백", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "A02", "reason_title": "유효 승인 없음", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-080", "category": "declined_auth", "category_label": "승인거절 후 결제", "network": "comparison", "question": "'승인거절 후 결제' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "11.2", "reason_title": "승인거절 후 결제", "category": "authorization", "category_ko": "승인", "time_limit_days": 75, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4808", "reason_title": "승인 관련 차지백", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "A02", "reason_title": "유효 승인 없음", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-081", "category": "expired_auth", "category_label": "승인 만료", "network": "comparison", "question": "'승인 만료' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "11.3", "reason_title": "무승인 거래", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4808", "reason_title": "승인 관련 차지백", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "A08", "reason_title": "승인 유효기간 경과", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-082", "category": "amount_exceeds_auth", "category_label": "승인금액 초과", "network": "comparison", "question": "'승인금액 초과' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "12.5", "reason_title": "결제금액 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4834", "reason_title": "결제 처리 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "A01", "reason_title": "승인금액 초과", "category": "authorization", "category_ko": "승인", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["승인 코드 및 승인 시각", "승인 금액과 매입 금액 대사자료", "강제매입(force-post) 사유", "가맹점번호(MID/TID) 및 정산배치 참조번호"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-083", "category": "late_presentment", "category_label": "지연 제출", "network": "comparison", "question": "'지연 제출' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "12.1", "reason_title": "지연 제출", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4842", "reason_title": "지연 제출", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "P07", "reason_title": "지연 제출", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-084", "category": "duplicate", "category_label": "중복 결제", "network": "comparison", "question": "'중복 결제' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "12.6.1", "reason_title": "중복 결제", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4834", "reason_title": "결제 처리 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "P08", "reason_title": "중복 청구", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-085", "category": "paid_other_means", "category_label": "타 결제수단 중복", "network": "comparison", "question": "'타 결제수단 중복' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "12.6.2", "reason_title": "타 결제수단으로 이미 지불", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4834", "reason_title": "결제 처리 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C14", "reason_title": "타 결제수단으로 이미 지불", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-086", "category": "incorrect_amount", "category_label": "결제금액 오류", "network": "comparison", "question": "'결제금액 오류' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "12.5", "reason_title": "결제금액 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4834", "reason_title": "결제 처리 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 90, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "P05", "reason_title": "결제금액 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-087", "category": "not_received", "category_label": "상품·서비스 미수령", "network": "comparison", "question": "'상품·서비스 미수령' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.1", "reason_title": "상품/서비스 미수령", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4855", "reason_title": "상품·서비스 미제공", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C08", "reason_title": "상품·서비스 미수령", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-088", "category": "services_not_rendered", "category_label": "서비스 미이행", "network": "comparison", "question": "'서비스 미이행' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.1", "reason_title": "상품/서비스 미수령", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4859", "reason_title": "서비스 미이행", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C08", "reason_title": "상품·서비스 미수령", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-089", "category": "cancelled_recurring", "category_label": "정기결제 취소", "network": "comparison", "question": "'정기결제 취소' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.2", "reason_title": "정기결제 취소 후 청구", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4853", "reason_title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C28", "reason_title": "정기결제 취소 후 청구", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-090", "category": "not_as_described", "category_label": "상품 불일치", "network": "comparison", "question": "'상품 불일치' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.3", "reason_title": "표시와 다름 또는 하자 상품/서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4853", "reason_title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C31", "reason_title": "표시와 다른 상품·서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-091", "category": "defective", "category_label": "하자·불량", "network": "comparison", "question": "'하자·불량' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.3", "reason_title": "표시와 다름 또는 하자 상품/서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4853", "reason_title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C32", "reason_title": "손상·하자 상품·서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-092", "category": "credit_not_processed", "category_label": "환불 미처리", "network": "comparison", "question": "'환불 미처리' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.6", "reason_title": "환불 미처리", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4860", "reason_title": "환불 미처리", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C02", "reason_title": "환불 미처리", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-093", "category": "cancelled_goods", "category_label": "주문 취소 미반영", "network": "comparison", "question": "'주문 취소 미반영' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.7", "reason_title": "주문 취소 미반영", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4853", "reason_title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C05", "reason_title": "주문 취소 상품·서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-094", "category": "goods_returned", "category_label": "반품 후 미환불", "network": "comparison", "question": "'반품 후 미환불' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.6", "reason_title": "환불 미처리", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4860", "reason_title": "환불 미처리", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C04", "reason_title": "반품·인수거절 상품", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-095", "category": "misrepresentation", "category_label": "허위 표시", "network": "comparison", "question": "'허위 표시' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.5", "reason_title": "허위 표시", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4853", "reason_title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C31", "reason_title": "표시와 다른 상품·서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-096", "category": "does_not_recognize", "category_label": "미인지 결제", "network": "comparison", "question": "'미인지 결제' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "10.4", "reason_title": "기타 사기 - 카드 미소지(CNP) 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4863", "reason_title": "카드소지자 미인지 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 60, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "F24", "reason_title": "회원 미승인 결제", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-097", "category": "questionable_merchant", "category_label": "의심 가맹점", "network": "comparison", "question": "'의심 가맹점' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "10.4", "reason_title": "기타 사기 - 카드 미소지(CNP) 거래", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4849", "reason_title": "의심 가맹점 활동", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "F24", "reason_title": "회원 미승인 결제", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-098", "category": "currency_error", "category_label": "통화 오류", "network": "comparison", "question": "'통화 오류' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "12.5", "reason_title": "결제금액 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4846", "reason_title": "잘못된 통화코드 사용", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "P05", "reason_title": "결제금액 오류", "category": "processing_error", "category_ko": "처리 오류", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["원거래 영수증 / TID", "정산 배치 리포트(단일 매입 확인)", "환불 확인서 또는 크레딧 거래 ARN", "매입 시점의 통화 환산표"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-099", "category": "chip_pin_shift", "category_label": "칩/PIN 책임전환", "network": "comparison", "question": "'칩/PIN 책임전환' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "10.1", "reason_title": "EMV 책임전환 - 위조 사기", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": true, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4871", "reason_title": "칩/PIN 책임전환", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "F30", "reason_title": "EMV 위조", "category": "fraud", "category_ko": "사기", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["AVS/CVV 매칭 로그", "3-D Secure(3DS) 인증 결과 (ECI/CAVV)", "IP 주소, 디바이스 지문, 위치정보", "배송지-청구지 주소 일치 여부", "서명 포함 배송 증빙(택배 트래킹)", "동일 카드소지자의 과거 거래 이력"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}, {"id": "ctx-100", "category": "no_show_hotel", "category_label": "호텔 노쇼", "network": "comparison", "question": "'호텔 노쇼' 시나리오에서 비자·마스터카드·아멕스의 사유코드, 제기 기한, 필요 증빙을 비교해 주세요.", "answer": {"networks": [{"network": "비자 (Visa)", "framework": "Visa Claims Resolution (VCR / 비자 클레임 해결절차)", "reason_code": "13.7", "reason_title": "주문 취소 미반영", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://visa/vcr-2024.pdf"}, {"network": "마스터카드 (Mastercard)", "framework": "Mastercard Chargeback Guide (MCCG / 마스터카드 차지백 가이드)", "reason_code": "4853", "reason_title": "카드소지자 이의제기 (상품·서비스)", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://mastercard/mccg-2024.pdf"}, {"network": "아메리칸 익스프레스 (Amex)", "framework": "Amex Merchant Regulations - Dispute Policy (아멕스 가맹점 규정 - 분쟁 정책)", "reason_code": "C05", "reason_title": "주문 취소 상품·서비스", "category": "consumer_dispute", "category_ko": "소비자 분쟁", "time_limit_days": 120, "requires_pre_arbitration": false, "evidence_checklist": ["배송 증빙(택배 트래킹 + 서명)", "계약서 또는 이용약관 동의 기록", "결제화면에 표시된 환불·취소 정책", "카드소지자와의 커뮤니케이션 로그(이메일/채팅)", "판매 시점 상품 사진 또는 상세", "정기결제 동의(옵트인) 기록"], "source_ref": "internal://amex/dispute-policy-2024.pdf"}], "note": "대부분의 분쟁 유형은 거래일(또는 예상 배송일) 기준 120일 이내 제기 기한이 적용됩니다."}}]</script>
+
+<div class="app">
+  <header class="top">
+    <div class="wordmark">
+      <span class="glyph">차지백 <em>트리아지</em></span>
+      <span class="kicker">Prototype · MCP 백엔드</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="legend" aria-hidden="true">
+      <span class="chip"><span class="swatch visa"></span>비자</span>
+      <span class="chip"><span class="swatch mc"></span>마스터카드</span>
+      <span class="chip"><span class="swatch amex"></span>아멕스</span>
+    </div>
+    <button class="theme-toggle" id="themeToggle" type="button">테마</button>
+  </header>
+
+  <main>
+    <aside class="rail">
+      <div class="panel">
+        <h2>시나리오 질의</h2>
+        <div class="field-stack">
+          <div>
+            <label for="ask">상황을 한 문장으로 설명하세요</label>
+            <textarea id="ask" placeholder="예: 비자로 결제했는데 상품이 오지 않았어요"></textarea>
+          </div>
+          <div class="chip-row" id="netFilters" role="group" aria-label="네트워크 필터">
+            <button class="filter-chip" data-net="all" aria-pressed="true">전체</button>
+            <button class="filter-chip" data-net="visa" aria-pressed="false">비자</button>
+            <button class="filter-chip" data-net="mastercard" aria-pressed="false">마스터카드</button>
+            <button class="filter-chip" data-net="amex" aria-pressed="false">아멕스</button>
+            <button class="filter-chip" data-net="comparison" aria-pressed="false">3사 비교</button>
+          </div>
+          <div class="row">
+            <button class="primary" id="searchBtn" type="button">매칭 찾기</button>
+            <button class="ghost" id="clearBtn" type="button">지우기</button>
+          </div>
+          <div class="quick-help">
+            예시: <code>중복 결제</code>, <code>위조카드</code>, <code>구독 해지</code>, <code>불량 상품</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>사유코드 직접 조회</h2>
+        <div class="field-stack">
+          <div class="row">
+            <div>
+              <label for="netSel">네트워크</label>
+              <select id="netSel">
+                <option value="visa">비자</option>
+                <option value="mastercard">마스터카드</option>
+                <option value="amex">아멕스</option>
+              </select>
+            </div>
+            <div>
+              <label for="codeSel">사유코드</label>
+              <select id="codeSel"></select>
+            </div>
+          </div>
+          <button class="primary" id="lookupBtn" type="button">조회</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>시나리오 비교</h2>
+        <div class="field-stack">
+          <div>
+            <label for="catSel">시나리오 카테고리</label>
+            <select id="catSel"></select>
+          </div>
+          <button class="primary" id="compareBtn" type="button">3사 비교</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="results" id="results" aria-live="polite"></section>
+  </main>
+
+  <footer class="foot">
+    <div>chargeback-mcp/prototype · 사유코드 48개 · 컨텍스트 100개 · 규정 PDF는 internal:// 로 참조</div>
+    <div>키워드 오버랩 검색 — 실서비스에서는 임베딩 검색으로 교체 권장</div>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const RULES = JSON.parse(document.getElementById("rules-data").textContent);
+  const CONTEXTS = JSON.parse(document.getElementById("contexts-data").textContent);
+  const CAT_LABEL = {"fraud_cnp": "온라인(카드 미소지) 사기", "fraud_cp": "카드 소지 사기", "emv_counterfeit": "EMV 위조", "no_auth": "무승인 결제", "declined_auth": "승인거절 후 결제", "expired_auth": "승인 만료", "amount_exceeds_auth": "승인금액 초과", "late_presentment": "지연 제출", "duplicate": "중복 결제", "paid_other_means": "타 결제수단 중복", "incorrect_amount": "결제금액 오류", "not_received": "상품·서비스 미수령", "services_not_rendered": "서비스 미이행", "cancelled_recurring": "정기결제 취소", "not_as_described": "상품 불일치", "defective": "하자·불량", "credit_not_processed": "환불 미처리", "cancelled_goods": "주문 취소 미반영", "goods_returned": "반품 후 미환불", "misrepresentation": "허위 표시", "does_not_recognize": "미인지 결제", "questionable_merchant": "의심 가맹점", "currency_error": "통화 오류", "chip_pin_shift": "칩/PIN 책임전환", "no_show_hotel": "호텔 노쇼"};
+
+  const NET_NAME = { visa: "비자", mastercard: "마스터카드", amex: "아멕스" };
+  const NET_CSS  = { visa: "visa", mastercard: "mc", amex: "amex" };
+
+  // Theme toggle
+  const root = document.documentElement;
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    const cur = root.getAttribute("data-theme");
+    const next = cur === "dark" ? "light"
+              : cur === "light" ? "dark"
+              : matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+  });
+
+  // Populate selects
+  const netSel = document.getElementById("netSel");
+  const codeSel = document.getElementById("codeSel");
+  const catSel = document.getElementById("catSel");
+
+  function fillCodes(netKey) {
+    const codes = RULES.networks[netKey].reason_codes;
+    codeSel.innerHTML = "";
+    Object.entries(codes).forEach(([code, rc]) => {
+      const opt = document.createElement("option");
+      opt.value = code;
+      opt.textContent = `${code} — ${rc.title}`;
+      codeSel.appendChild(opt);
+    });
+  }
+  fillCodes(netSel.value);
+  netSel.addEventListener("change", () => fillCodes(netSel.value));
+
+  const categories = Array.from(new Set(CONTEXTS.map(c => c.category))).sort();
+  categories.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = CAT_LABEL[cat] || cat;
+    catSel.appendChild(opt);
+  });
+
+  // Filter chips
+  let activeNet = "all";
+  document.querySelectorAll("#netFilters .filter-chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#netFilters .filter-chip").forEach(b => b.setAttribute("aria-pressed", "false"));
+      btn.setAttribute("aria-pressed", "true");
+      activeNet = btn.dataset.net;
+    });
+  });
+
+  // Retrieval — Korean-aware tokenize: keep 2+ char sequences and CJK
+  function tokenize(s) {
+    const out = new Set();
+    String(s).toLowerCase().split(/[\s.,!?;:()\[\]{}"'`~/\\<>=+*&^%$#@|—–\-]+/).forEach(t => {
+      if (!t) return;
+      if (t.length >= 2) out.add(t);
+    });
+    return out;
+  }
+  function score(qTokens, ctx) {
+    const c = tokenize(ctx.question + " " + (ctx.category_label || "") + " " + (ctx.answer.reason_title || ""));
+    let s = 0;
+    qTokens.forEach(t => { if (c.has(t)) s++; });
+    return s;
+  }
+  function retrieve(query, netFilter, k = 5) {
+    const q = tokenize(query);
+    if (!q.size) return [];
+    let pool = CONTEXTS;
+    if (netFilter && netFilter !== "all") pool = pool.filter(c => c.network === netFilter);
+    return pool
+      .map(c => [score(q, c), c])
+      .filter(([s]) => s > 0)
+      .sort((a, b) => b[0] - a[0] || a[1].id.localeCompare(b[1].id))
+      .slice(0, k)
+      .map(([s, c]) => ({ score: s, ctx: c }));
+  }
+
+  // DOM helpers
+  const el = (tag, attrs = {}, ...children) => {
+    const n = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => {
+      if (k === "class") n.className = v;
+      else if (k === "html") n.innerHTML = v;
+      else n.setAttribute(k, v);
+    });
+    children.flat().forEach(c => {
+      if (c == null) return;
+      n.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    });
+    return n;
+  };
+
+  function evidenceList(items) {
+    const ul = el("ul", { class: "evidence" });
+    (items || []).forEach(i => ul.appendChild(el("li", {}, i)));
+    return ul;
+  }
+
+  function renderSingleAnswerCard(ctx, scoreVal) {
+    const a = ctx.answer;
+    const netCss = NET_CSS[ctx.network] || "";
+    const netLabel = NET_NAME[ctx.network] || ctx.network;
+
+    const card = el("article", { class: `card net-${netCss}` });
+    card.appendChild(el("div", { class: "stripe" }));
+
+    const body = el("div", { class: "body" });
+
+    const header = el("div", { class: "card-header" });
+    const title = el("div", {},
+      el("h3", { class: "card-title" }, a.reason_title || "—"),
+      el("div", { class: "card-sub" },
+        el("span", { class: `net-label ${netCss}` }, el("span", { class: "dot" }), netLabel),
+        " · ",
+        a.framework || ""
+      )
+    );
+    const scoreEl = scoreVal != null
+      ? el("span", { class: "card-score" }, `일치도 ${scoreVal}`)
+      : null;
+    header.appendChild(title);
+    if (scoreEl) header.appendChild(scoreEl);
+    body.appendChild(header);
+
+    body.appendChild(el("div", { class: "question" },
+      el("span", { class: "q-mark" }, "Q"),
+      ctx.question
+    ));
+
+    const dl = el("dl", { class: "answer-grid" });
+    dl.appendChild(el("dt", {}, "사유코드"));
+    dl.appendChild(el("dd", {}, el("span", { class: "code-pill" }, a.reason_code || "—")));
+    dl.appendChild(el("dt", {}, "카테고리"));
+    dl.appendChild(el("dd", {}, el("span", { class: `cat cat-${a.category}` }, a.category_ko || a.category)));
+    dl.appendChild(el("dt", {}, "제기 기한"));
+    dl.appendChild(el("dd", { class: "mono" }, a.time_limit_days != null ? `${a.time_limit_days}일` : "—"));
+    dl.appendChild(el("dt", {}, "사전중재"));
+    dl.appendChild(el("dd", {}, a.requires_pre_arbitration ? "필요" : "불필요"));
+    body.appendChild(dl);
+
+    body.appendChild(el("div", {},
+      el("div", { class: "card-sub", style: "margin-bottom: 8px; font-weight: 700" }, "방어 증빙자료"),
+      evidenceList(a.evidence_checklist)
+    ));
+
+    body.appendChild(el("div", { class: "source" },
+      el("span", { class: "path" }, a.source_ref || ""),
+      el("span", {}, ctx.id)
+    ));
+
+    card.appendChild(body);
+    return card;
+  }
+
+  function renderComparisonCard(ctx) {
+    const card = el("article", { class: "card net-comparison" });
+    card.appendChild(el("div", { class: "stripe" }));
+
+    const body = el("div", { class: "body" });
+    body.appendChild(el("div", { class: "card-header" },
+      el("div", {},
+        el("h3", { class: "card-title" }, `3사 비교: ${ctx.category_label || ctx.category}`),
+        el("div", { class: "card-sub" }, "비자 · 마스터카드 · 아멕스")
+      )
+    ));
+    body.appendChild(el("div", { class: "question" },
+      el("span", { class: "q-mark" }, "Q"),
+      ctx.question
+    ));
+
+    const grid = el("div", { class: "compare-grid" });
+    ctx.answer.networks.forEach((n, idx) => {
+      const cssKey = ["visa", "mc", "amex"][idx];
+      const cell = el("div", { class: `compare-cell ${cssKey}` });
+      cell.appendChild(el("div", { class: `net-label ${cssKey}` },
+        el("span", { class: "dot" }), n.network
+      ));
+      cell.appendChild(el("div", { class: "code" }, n.reason_code));
+      cell.appendChild(el("div", { class: "t" }, n.reason_title));
+      cell.appendChild(el("div", { class: "meta" },
+        el("span", {}, `${n.time_limit_days || "—"}일`),
+        el("span", {}, n.requires_pre_arbitration ? "사전중재" : "사전중재 불필요")
+      ));
+      grid.appendChild(cell);
+    });
+    body.appendChild(grid);
+
+    if (ctx.answer.note) {
+      body.appendChild(el("div", { class: "source" },
+        el("span", { class: "path" }, ctx.answer.note),
+        el("span", {}, ctx.id)
+      ));
+    }
+    card.appendChild(body);
+    return card;
+  }
+
+  const results = document.getElementById("results");
+
+  function empty(title, msg) {
+    return el("div", { class: "empty" },
+      el("span", { class: "em" }, title),
+      msg || ""
+    );
+  }
+  function renderMeta(text) {
+    return el("div", { class: "result-meta" },
+      el("span", {}, ""),
+      el("span", { class: "count" }, text)
+    );
+  }
+  function clearResults() { results.replaceChildren(); }
+
+  function renderCards(hits) {
+    clearResults();
+    if (!hits.length) {
+      results.appendChild(empty("일치하는 결과 없음", "다른 키워드를 시도하거나, 네트워크 필터를 해제하거나, 직접 조회를 사용해 보세요."));
+      return;
+    }
+    results.appendChild(renderMeta(`${hits.length}건 매칭`));
+    hits.forEach(h => {
+      const card = h.ctx.network === "comparison"
+        ? renderComparisonCard(h.ctx)
+        : renderSingleAnswerCard(h.ctx, h.score);
+      results.appendChild(card);
+    });
+  }
+
+  document.getElementById("searchBtn").addEventListener("click", () => {
+    const q = document.getElementById("ask").value.trim();
+    if (!q) {
+      clearResults();
+      results.appendChild(empty("질의를 입력하세요", "분쟁 상황을 한 문장으로 설명하면 사전 구축된 100개 컨텍스트에서 매칭합니다."));
+      return;
+    }
+    renderCards(retrieve(q, activeNet, 5));
+  });
+  document.getElementById("ask").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) document.getElementById("searchBtn").click();
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    document.getElementById("ask").value = "";
+    clearResults();
+    renderIntro();
+  });
+
+  document.getElementById("lookupBtn").addEventListener("click", () => {
+    const netKey = netSel.value;
+    const code = codeSel.value;
+    const rc = RULES.networks[netKey].reason_codes[code];
+    const evidence = RULES.evidence_matrix[rc.category] || [];
+    const catKo = { fraud: "사기", authorization: "승인", processing_error: "처리 오류", consumer_dispute: "소비자 분쟁" }[rc.category];
+    const fake = {
+      id: `lookup-${netKey}-${code}`,
+      category: rc.category,
+      network: netKey,
+      question: `직접 조회: ${NET_NAME[netKey]} 사유코드 ${code}.`,
+      answer: {
+        network: RULES.networks[netKey].name,
+        framework: RULES.networks[netKey].framework,
+        reason_code: code,
+        reason_title: rc.title,
+        category: rc.category,
+        category_ko: catKo,
+        time_limit_days: rc.time_limit_days,
+        requires_pre_arbitration: !!rc.requires_pre_arbitration,
+        evidence_checklist: evidence,
+        source_ref: RULES.networks[netKey].source,
+      },
+    };
+    clearResults();
+    results.appendChild(renderMeta(`${NET_NAME[netKey]} · ${code}`));
+    results.appendChild(renderSingleAnswerCard(fake, null));
+  });
+
+  document.getElementById("compareBtn").addEventListener("click", () => {
+    const cat = catSel.value;
+    const ctx = CONTEXTS.find(c => c.category === cat && c.network === "comparison");
+    clearResults();
+    if (!ctx) {
+      results.appendChild(empty("비교 데이터 없음", "해당 카테고리의 3사 비교 뷰가 없습니다."));
+      return;
+    }
+    results.appendChild(renderMeta(`3사 비교 · ${CAT_LABEL[cat] || cat}`));
+    results.appendChild(renderComparisonCard(ctx));
+  });
+
+  function renderIntro() {
+    clearResults();
+    const comp = CONTEXTS.find(c => c.category === "not_received" && c.network === "comparison");
+    const single = CONTEXTS.find(c => c.category === "duplicate" && c.network === "visa");
+    results.appendChild(renderMeta("시작 화면 — 질의·직접조회·비교 중 하나로 시작하세요"));
+    if (comp) results.appendChild(renderComparisonCard(comp));
+    if (single) results.appendChild(renderSingleAnswerCard(single, null));
+  }
+  renderIntro();
+})();
+</script>
